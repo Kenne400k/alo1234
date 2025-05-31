@@ -1,0 +1,1009 @@
+// =======================================================================================
+// ============================ TƯỜNG AI v8.4.0 - HOÀN CHỈNH ============================
+// =======================================================================================
+
+const TUONGS = ["tuong", "tường"];
+const YOUTUBE_API_KEY = "AIzaSyD16U7WwrIFGOKijx0GR_3hU6p7Ww7JObM"; // Lưu ý bảo mật
+const GEMINI_API_KEY = "AIzaSyBRS5q0W9czyKuquLZ9-Ls-zZTVPaqR0qg"; // Lưu ý bảo mật
+const GEMINI_MODEL = "gemini-1.5-flash-latest";
+const GIPHY_KEY = "x2DSDHSAKfI06mgb0ON56fxtp9JAUTuQ";
+const THECATAPI_KEY = "live_R3gMhw4dZ9qymWsBCSjbfzmelZpiawsrH4VwR8qmEs316MDgvwcvSMDgWuxkEdK3";
+const GENIUS_API_KEY = "YOUR_GENIUS_API_KEY"; // <<< THAY API KEY CỦA BẠN VÀO ĐÂY
+const OPENWEATHERMAP_API_KEY = "619bf420046f8164a5246c084d56e547"; // API Key bạn cung cấp
+
+const fs = require("fs-extra");
+const path = require("path");
+const axios = require("axios");
+const ytdl = require("@distube/ytdl-core");
+const ffmpeg = require("fluent-ffmpeg");
+const qs = require("qs");
+const { v4: uuidv4 } = require('uuid');
+
+const DATA_DIR = path.join(__dirname, "../../data");
+const TUONG_DIR = path.join(DATA_DIR, "tuong_ai");
+const VISION_CACHE_DIR = path.join(TUONG_DIR, "cache_vision");
+const TMP_DIR = path.join(__dirname, "tmp_tuong");
+
+[DATA_DIR, TUONG_DIR, VISION_CACHE_DIR, TMP_DIR].forEach(dir => fs.ensureDirSync(dir));
+
+const userDataFile = path.join(TUONG_DIR, "user_data.json");
+const groupDataFile = path.join(TUONG_DIR, "group_data.json");
+const memoriesFile = path.join(TUONG_DIR, "memories.json");
+const playlistsFile = path.join(TUONG_DIR, "playlists.json");
+const remindersFile = path.join(TUONG_DIR, "reminders.json");
+const autoAIFile = path.join(TUONG_DIR, "auto_ai.json");
+
+const allDataFiles = [userDataFile, groupDataFile, memoriesFile, playlistsFile, remindersFile, autoAIFile];
+allDataFiles.forEach(file => {
+  if (!fs.existsSync(file)) fs.writeFileSync(file, JSON.stringify({}));
+});
+
+let userData = {}; try { userData = JSON.parse(fs.readFileSync(userDataFile, 'utf-8')); } catch (e) { console.log("Không thể tải userData.json, dùng object rỗng."); }
+let groupData = {}; try { groupData = JSON.parse(fs.readFileSync(groupDataFile, 'utf-8')); } catch (e) { console.log("Không thể tải groupData.json, dùng object rỗng."); }
+let autoAI = {}; try { autoAI = JSON.parse(fs.readFileSync(autoAIFile, 'utf-8')); } catch (e) { console.log("Không thể tải autoAI.json, dùng object rỗng."); }
+
+const CONVERSATION_TIMEOUT_MS = 5 * 60 * 1000;
+let activeConversations = {};
+let BOT_ID = null;
+
+// --- CÁC HÀM HELPER ---
+function saveData(type) {
+  try {
+    if (type === 'userData') fs.writeFileSync(userDataFile, JSON.stringify(userData, null, 2));
+    else if (type === 'groupData') fs.writeFileSync(groupDataFile, JSON.stringify(groupData, null, 2));
+    else if (type === 'autoAI') fs.writeFileSync(autoAIFile, JSON.stringify(autoAI, null, 2));
+  } catch (e) { console.error(`Lỗi lưu ${type}:`, e); }
+}
+
+function unsign(str) { 
+  return (str || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9 ]+/g, " ").replace(/\s+/g, " ").trim();
+}
+
+function parseMediaRequest(userMessage, type = "detect") {
+    const msg = unsign(userMessage);
+    const negPhrases = ["không", "đừng", "loại trừ", "tránh", "not", "no"];
+    let negKeywords = [];
+    let positive = msg;
+    negPhrases.forEach(neg => {
+        if (msg.includes(neg)) {
+            let after = msg.split(neg).pop().replace(/^(gửi|video|nhạc|clip|gif|meme)/, "").trim();
+            if (after && after.length > 1) negKeywords.push(after);
+            positive = positive.replace(neg + " " + after, "");
+        }
+    });
+
+    if (/(buồn|chán|sad|😭|😢|stress)/.test(userMessage)) return { type: "mp3", query: "nhạc buồn", mood: "sad", negKeywords };
+    if (/(vui|meme|hài|cười|happy|😆)/.test(userMessage)) return { type: "mp4", query: "clip hài", mood: "happy", negKeywords };
+    if (/(gif|ảnh động)/.test(userMessage)) return { type: "gif", query: positive.replace(/(gif|ảnh động)/g, "").trim(), negKeywords };
+
+    let req = null;
+    if (type === "detect" || type === "video") {
+        const videoWords = ["video", "clip", "youtube", "phim", "trailer", "mv", "show"];
+        videoWords.forEach(w => { if (positive.includes(w)) req = { type: "mp4", query: positive.split(w).pop().trim() }; });
+    }
+    if ((type === "detect" || type === "mp3") && !req) {
+        const mp3Words = ["nhac", "mp3", "audio", "bai hat", "song", "music"];
+        mp3Words.forEach(w => { if (positive.includes(w)) req = { type: "mp3", query: positive.split(w).pop().trim() }; });
+    }
+    if ((type === "detect" || type === "image") && !req) {
+        const imgWords = ["ảnh", "anh", "hình", "meme", "wallpaper"];
+        imgWords.forEach(w => { if (positive.includes(w)) req = { type: "img", query: positive.split(w).pop().trim() }; });
+    }
+    if (req) req.negKeywords = negKeywords;
+    return req;
+}
+
+async function searchYouTube(query, maxResults = 5, negKeywords = []) {
+    try {
+        const response = await axios.get(`https://www.googleapis.com/youtube/v3/search`, {
+            params: { q: query, key: YOUTUBE_API_KEY, part: "snippet", maxResults, type: "video", order: "relevance", safeSearch: "moderate" }
+        });
+        let results = response.data.items.map((video) => ({
+            title: video.snippet.title,
+            videoId: video.id.videoId,
+            thumbnail: video.snippet.thumbnails.high?.url || video.snippet.thumbnails.default.url,
+            url: `https://www.youtube.com/watch?v=${video.id.videoId}`,
+            channel: video.snippet.channelTitle,
+            publishedAt: video.snippet.publishedAt
+        }));
+        const keywords = query.toLowerCase().split(" ").filter(k => k.length > 1);
+        results = results.filter(r => keywords.every(w => unsign(r.title).includes(unsign(w))));
+        if (negKeywords && negKeywords.length) {
+            results = results.filter(r => !negKeywords.some(neg => unsign(r.title).includes(unsign(neg))));
+        }
+        return results;
+    } catch (e) { console.error("Lỗi searchYouTube:", e.message); return []; }
+}
+
+async function downloadYouTubeMp3(videoId, outPath, maxSeconds = 300) {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const stream = ytdl(videoId, { quality: "highestaudio", filter: "audioonly", highWaterMark: 1 << 25 });
+      ffmpeg(stream).audioBitrate(128).audioCodec('libmp3lame').setDuration(maxSeconds).format("mp3")
+        .on("end", () => resolve(outPath)).on("error", e => reject(e)).save(outPath);
+    } catch (e) { reject(e); }
+  });
+}
+
+async function downloadYouTubeMp4(videoId, outPath, maxSeconds = 300, quality = "360p") {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const info = await ytdl.getInfo(videoId);
+      let format = info.formats.find(f => f.qualityLabel === quality && f.container === "mp4" && f.hasAudio && f.hasVideo) || 
+                   info.formats.find(f => f.itag === 18) || 
+                   info.formats.find(f => f.itag === 22);   
+      if (!format) format = ytdl.chooseFormat(info.formats, { quality:"lowestvideo", filter:"videoandaudio", container: "mp4"});
+      if (!format) return reject("Không tìm thấy video MP4 phù hợp!");
+      const stream = ytdl(videoId, { format, highWaterMark: 1 << 25 });
+      ffmpeg(stream).setDuration(maxSeconds).videoCodec('libx264').audioCodec('aac').format("mp4")
+        .on("end", () => resolve(outPath)).on("error", e => reject(e)).save(outPath);
+    } catch (e) { reject(e); }
+  });
+}
+
+async function searchGif(query) {
+  try {
+    const q = encodeURIComponent(query);
+    const res = await axios.get(`https://api.giphy.com/v1/gifs/search?${qs.stringify({ q, api_key: GIPHY_KEY, limit: 5 })}`);
+    if (res.data.data && res.data.data.length > 0) {
+        const randomIndex = Math.floor(Math.random() * res.data.data.length);
+        return res.data.data[randomIndex]?.images?.original?.url || null;
+    }
+    return null;
+  } catch { return null; }
+}
+
+async function searchLyrics(song) {
+  try {
+    if (!GENIUS_API_KEY || GENIUS_API_KEY === "YOUR_GENIUS_API_KEY") {
+        return `Tường chưa được cài đặt API tìm lời bài hát (Genius). Lời bài hát cho "${song}" sẽ được cập nhật sau nha!`;
+    }
+    return `Tính năng tìm lời bài hát cho "${song}" đang được Tường phát triển thêm. Hiện tại Tường chưa tìm được đâu :P`;
+  } catch (e) { console.error("Lỗi searchLyrics:", e); return `Tường tìm lời bài hát "${song}" không thấy rồi :(`; }
+}
+
+async function createQrCode(text) {
+  return `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(text)}`;
+}
+
+async function catImage() {
+  try {
+    const res = await axios.get("https://api.thecatapi.com/v1/images/search", { headers: { 'x-api-key': THECATAPI_KEY } });
+    return res.data[0]?.url;
+  } catch { return null; }
+}
+
+function getImageMimeType(filePath) {
+  const ext = path.extname(filePath).toLowerCase();
+  if ([".jpg", ".jpeg"].includes(ext)) return "image/jpeg";
+  if (ext === ".png") return "image/png";
+  if (ext === ".webp") return "image/webp";
+  return "application/octet-stream";
+}
+
+function imageToBase64(filePath) {
+  return fs.readFileSync(filePath, { encoding: "base64" });
+}
+
+function getMoodBasedPrompt(basePrompt, threadID, forVision = false) {
+    const groupMood = groupData[threadID]?.personality || "mặc định";
+    let finalPrompt = basePrompt;
+    let moodPrefix = "";
+    if (groupMood === "hài hước") {
+        moodPrefix = `Bạn là Tường AI, một cây hài chính hiệu của nhóm, hãy trả lời cực kỳ dí dỏm, troll và hài hước. ${forVision ? 'Khi phân tích ảnh, hãy thêm nhiều muối và bình luận thật bá đạo!' : ''} `;
+    } else if (groupMood === "nghiêm túc") {
+        moodPrefix = `Bạn là Tường AI, một trợ lý chuyên nghiệp, thông thái và lịch sự. Hãy trả lời một cách chính xác và rõ ràng. ${forVision ? 'Phân tích ảnh một cách khách quan và chi tiết.' : ''} `;
+    } else if (groupMood === "dễ thương") {
+        moodPrefix = `Bạn là Tường AI, siêu cấp đáng yêu, moe moe lắm nhaaa <3. Hãy trả lời thật cute và tình cảm. ${forVision ? 'Xem ảnh xong bình luận cute xỉu nha.' : ''} `;
+    }
+    if (moodPrefix) {
+        const knownSalutations = [
+            "Bạn là Tường AI, một trợ lý ảo đáng yêu và thông minh.",
+            "Bạn là Tường AI, một trợ lý ảo thông minh và thân thiện.",
+            "Bạn là Tường AI, trợ lý ảo thông minh và thân thiện."
+        ];
+        let replaced = false;
+        for (const salutation of knownSalutations) {
+            if (basePrompt.startsWith(salutation)) {
+                finalPrompt = moodPrefix + basePrompt.substring(salutation.length).trim();
+                replaced = true;
+                break;
+            }
+        }
+        if (!replaced) finalPrompt = moodPrefix + basePrompt;
+    }
+    return finalPrompt;
+}
+
+async function geminiVisionRequest({ prompt, imagePath, threadID }) {
+  const mimeType = getImageMimeType(imagePath);
+  const imgBase64 = imageToBase64(imagePath);
+  const moodAdjustedPrompt = getMoodBasedPrompt(prompt, threadID, true);
+  const reqBody = { contents: [{ parts: [{ text: moodAdjustedPrompt }, { inline_data: { mime_type: mimeType, data: imgBase64 } }] }] };
+  try {
+    const { data } = await axios.post( `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_API_KEY}`, reqBody, { headers: { "Content-Type": "application/json" } });
+    return data?.candidates?.[0]?.content?.parts?.[0]?.text || "[Gemini Vision] Tường không nhận được phản hồi từ ảnh.";
+  } catch (error) {
+    console.error("Lỗi API Gemini Vision:", error.response?.data?.error?.message || error.message);
+    return "[Gemini Vision] Tường gặp lỗi khi phân tích ảnh: " + (error.response?.data?.error?.message || "Lỗi không xác định");
+  }
+}
+
+async function geminiTextRequest(prompt, threadID) {
+  const moodAdjustedPrompt = getMoodBasedPrompt(prompt, threadID, false);
+  const reqBody = { contents: [{ parts: [{ text: moodAdjustedPrompt }] }] };
+  try {
+    const { data } = await axios.post( `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_API_KEY}`, reqBody, { headers: { "Content-Type": "application/json" } });
+    return data?.candidates?.[0]?.content?.parts?.[0]?.text || "[Gemini] Tường không có phản hồi từ AI.";
+  } catch (error) {
+    console.error("Lỗi API Gemini Text:", error.response?.data?.error?.message || error.message);
+    return "[Gemini] Tường gặp lỗi khi suy nghĩ: " + (error.response?.data?.error?.message || "Lỗi không xác định");
+  }
+}
+
+async function getAIResponse(userMessage, userState, memory, context, threadID) {
+  let basePrompt = `Bạn là Tường AI, một trợ lý ảo đáng yêu và thông minh. Hãy trả lời người dùng một cách NGẮN GỌN (tầm 20-50 từ), thân thiện, không cần nhắc lại câu hỏi của họ, và thể hiện một chút cá tính dễ thương.`;
+  basePrompt += "\n\nNgười dùng nhắn: \"" + userMessage + "\"";
+  try {
+    return await geminiTextRequest(basePrompt, threadID);
+  } catch (e) {
+    console.error("Lỗi gọi getAIResponse (geminiTextRequest):", e);
+    return "Ui, Tường đang bị \"đứng hình\" một chút xíu, bạn thử lại sau nha! 🤖💖";
+  }
+}
+
+async function sendGeneratedQrCode(api, threadID, messageID, qrDataToEncode, successMessage) {
+    if (qrDataToEncode) {
+        const qrImageUrl = await createQrCode(qrDataToEncode);
+        try {
+            const stream = await axios({ url: qrImageUrl, responseType: "stream" }).then(r => r.data);
+            return api.sendMessage({ body: successMessage, attachment: stream }, threadID, messageID);
+        } catch (e) {
+            console.error("Lỗi gửi QR code:", e);
+            return api.sendMessage("Tường tạo QR được rồi mà gửi lên bị lỗi mất tiêu 😥 Bạn thử lại xem sao.", threadID, messageID);
+        }
+    }
+}
+
+async function downloadAndSendChosenMedia(api, threadID, messageID, senderID, chosenVideo, mediaType, quality = "360p") {
+    const ext = mediaType === "mp3" ? "mp3" : "mp4";
+    const filePath = path.join(TMP_DIR, `${chosenVideo.videoId}_${Date.now()}.${ext}`);
+    try {
+        api.sendMessage(`⏳ Tường đang tải ${mediaType === "mp3" ? "bài hát" : "video"} "${chosenVideo.title}" nè... Chờ Tường xíu nha!`, threadID, null, messageID); // Reply vào tin chọn số
+        if (mediaType === "mp3") await downloadYouTubeMp3(chosenVideo.videoId, filePath, 300);
+        else await downloadYouTubeMp4(chosenVideo.videoId, filePath, 300, quality);
+
+        let msgData = {
+            body: `✅ Xong rồi nè! ${mediaType === "mp3" ? "Bài hát" : "Video"} "${chosenVideo.title}" của bạn đây.\n🔗 Link gốc: https://www.youtube.com/watch?v=$${chosenVideo.videoId}`,
+            attachment: fs.createReadStream(filePath)
+        };
+        api.sendMessage(msgData, threadID, () => { if (fs.existsSync(filePath)) fs.unlinkSync(filePath); });
+
+        if (mediaType === "mp3") {
+            api.sendMessage({ body: `Bạn có muốn Tường tìm lời bài hát "${chosenVideo.title}" không? Reply "lyrics" nếu muốn nha!`, }, threadID, (err, info) => {
+                if (err) return console.error("Lỗi gửi câu hỏi lyrics:", err);
+                if (global.client && global.client.handleReply && info) {
+                    global.client.handleReply.push({
+                        name: module.exports.config.name,
+                        messageID: info.messageID,
+                        author: senderID,
+                        type: "lyrics_youtube",
+                        songTitle: chosenVideo.title
+                    });
+                }
+            });
+        }
+    } catch (e) {
+        console.error(`Lỗi tải ${mediaType} "${chosenVideo.title}":`, e.message);
+        if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+        api.sendMessage(`❌ Oops! Tường tải ${mediaType === "mp3" ? "nhạc" : "video"} "${chosenVideo.title}" bị lỗi rồi. Lỗi: ${e.message}`, threadID);
+    }
+}
+
+async function sendMedia(api, event, req, quality = "360p") {
+    const { threadID, messageID, senderID } = event;
+    if (req.type === "mp3" || req.type === "mp4") {
+        let videoList = await searchYouTube(req.query, 5, req.negKeywords);
+        if (!videoList || !videoList.length) {
+            return api.sendMessage(`Tường tìm hổng thấy ${req.type === "mp3" ? "nhạc" : "video"} nào khớp với "${req.query}" hết trơn á!`, threadID, messageID);
+        }
+
+        if (videoList.length === 1) {
+            await downloadAndSendChosenMedia(api, threadID, messageID, senderID, videoList[0], req.type, quality);
+        } else {
+            let choiceMsg = `Tường tìm thấy mấy ${req.type === "mp3" ? "bài hát" : "video"} này nè:\n\n`;
+            const choices = [];
+            videoList.forEach((video, index) => {
+                choiceMsg += `${index + 1}. ${video.title}\n`;
+                choices.push(video);
+            });
+            choiceMsg += `\nBạn muốn chọn số mấy? Reply số tương ứng nha (ví dụ: 1).\nHoặc reply "khác" nếu muốn Tường tìm lại với từ khóa khác.`;
+
+            api.sendMessage(choiceMsg, threadID, (err, info) => {
+                if (err) return console.error("Lỗi gửi lựa chọn YouTube:",err);
+                if (global.client && global.client.handleReply && info) {
+                    global.client.handleReply.push({
+                        name: module.exports.config.name,
+                        messageID: info.messageID,
+                        author: senderID,
+                        type: `yt_choice`, 
+                        mediaType: req.type,
+                        choices: choices,
+                        originalQuery: req.query,
+                        quality: quality
+                    });
+                }
+            }, messageID);
+        }
+        return;
+    }
+    if (req.type === "gif") {
+        const gifUrl = await searchGif(req.query);
+        if (gifUrl) await api.sendMessage({ body: `GIF "${req.query}" cho bạn nè 🤸`, attachment: await axios({ url: gifUrl, responseType: "stream" }).then(r => r.data) }, threadID, messageID);
+        else await api.sendMessage("Tường tìm hổng ra GIF nào hợp ý bạn hết á!", threadID, messageID);
+        return;
+    }
+    if (req.type === "img") {
+        if (/(mèo|cat|meow)/i.test(req.query || "")) {
+             const catImgUrl = await catImage();
+            if (catImgUrl) return api.sendMessage({ body: " Ảnh mèo cute cho bạn nè 😻", attachment: await axios({ url: catImgUrl, responseType: "stream" }).then(r => r.data) }, threadID, messageID);
+            else return api.sendMessage("Huhu, Tường tìm ảnh mèo mà không thấy...", threadID, messageID);
+        } else {
+            return api.sendMessage(`Tường chưa hỗ trợ tìm ảnh chung với từ khóa "${req.query}" ngoài ảnh mèo. Bạn thử dùng Google xem sao nha!`, threadID, messageID);
+        }
+    }
+}
+
+async function handleGu(api, event, args, userKey) {
+  const guQuery = args.replace(new RegExp(`^(${TUONGS.join("|")})\\s+set\\s+gu\\s+nhac\\s+`, "i"), "").trim();
+  if (guQuery) {
+      userData[userKey].music = guQuery.split(/,|;/).map(s => s.trim()).filter(s => s);
+      saveData('userData');
+      return api.sendMessage(`Tường đã nhớ gu nhạc của bạn là: ${userData[userKey].music.join(", ")} rồi đó nha! 😉`, event.threadID, event.messageID);
+  } else {
+      const currentGu = userData[userKey]?.music?.join(", ") || "chưa có gì hết trơn";
+      return api.sendMessage(`Gu nhạc của bạn hiện tại là: ${currentGu}. Dùng "tuong set gu nhac [thể loại1], [thể loại2]" để Tường biết nha.`, event.threadID, event.messageID);
+  }
+}
+
+function parseTime(timeStr) {
+    const now = new Date();
+    timeStr = timeStr.toLowerCase();
+    let match = timeStr.match(/sau\s+(\d+)\s+(phút|phut|p|giờ|gio|g|h|ngày|ngay|n|d)/i);
+    if (match) {
+        const value = parseInt(match[1]);
+        const unit = match[2];
+        let newTime = new Date(now.getTime());
+        if (unit.startsWith('p')) newTime.setMinutes(newTime.getMinutes() + value);
+        else if (unit.startsWith('g') || unit.startsWith('h')) newTime.setHours(newTime.getHours() + value);
+        else if (unit.startsWith('n') || unit.startsWith('d')) newTime.setDate(newTime.getDate() + value);
+        return newTime.getTime();
+    }
+    match = timeStr.match(/(\d{1,2}):(\d{1,2})(?:\s+(\d{1,2})\/(\d{1,2})(?:\/(\d{4}|\d{2}))?)?/i);
+    if (match) {
+        const hour = parseInt(match[1]);
+        const minute = parseInt(match[2]);
+        let day = now.getDate();
+        let month = now.getMonth();
+        let year = now.getFullYear();
+        if (match[3] && match[4]) {
+            day = parseInt(match[3]);
+            month = parseInt(match[4]) - 1;
+            if (match[5]) { year = parseInt(match[5]); if (year < 100) year += 2000; }
+        }
+        const reminderDate = new Date(year, month, day, hour, minute, 0, 0);
+        if (reminderDate.getTime() < now.getTime() && !(match[3] && match[4])) {
+            reminderDate.setDate(reminderDate.getDate() + 1);
+        }
+        return reminderDate.getTime();
+    }
+    match = timeStr.match(/(?:(\d+)\s*(?:giờ|g|h))?\s*(?:(\d+)\s*(?:phút|p))?\s*(nữa|nữa)/i);
+    if (match && (match[1] || match[2])) {
+        const hoursToAdd = parseInt(match[1] || 0);
+        const minutesToAdd = parseInt(match[2] || 0);
+        let newTime = new Date(now.getTime());
+        newTime.setHours(newTime.getHours() + hoursToAdd);
+        newTime.setMinutes(newTime.getMinutes() + minutesToAdd);
+        return newTime.getTime();
+    }
+    return null;
+}
+
+async function checkReminders(api) {
+    const now = Date.now();
+    let currentReminders = [];
+    try { currentReminders = JSON.parse(fs.readFileSync(remindersFile, 'utf-8')); } catch (e) { return; }
+
+    const stillPendingReminders = [];
+    let updated = false;
+
+    for (const reminder of currentReminders) {
+        if (!reminder || typeof reminder.time !== 'number' || !reminder.threadID || !reminder.message) {
+            console.warn("[REMINDER] Nhắc nhở không hợp lệ, bỏ qua:", reminder);
+            updated = true;
+            continue;
+        }
+        if (reminder.time <= now) {
+            try {
+                let message = `🔔 Ting ting! Tường nhắc bạn nè ${reminder.userName ? `@${reminder.userName}` : 'ơi'}:\n\n"${reminder.message}"`;
+                if (reminder.originalCommand) {
+                    message += `\n\n(Bạn đã dặn Tường: "${reminder.originalCommand}")`;
+                }
+                if (api && typeof api.sendMessage === 'function') {
+                    api.sendMessage(message, reminder.threadID, (err) => {
+                        if (err) console.error("[REMINDER] Lỗi gửi tin nhắn nhắc nhở:", err, "cho reminder ID:", reminder.id);
+                    });
+                    console.log(`[REMINDER] Đã gửi nhắc nhở ID ${reminder.id.substring(0,6)} cho ${reminder.userName} ở thread ${reminder.threadID}`);
+                } else {
+                    console.error("[REMINDER] API object không hợp lệ để gửi nhắc nhở.");
+                }
+                updated = true;
+            } catch (e) { console.error("[REMINDER] Lỗi nghiêm trọng khi gửi nhắc nhở:", e); }
+        } else {
+            stillPendingReminders.push(reminder);
+        }
+    }
+    if (updated) {
+        try {
+            fs.writeFileSync(remindersFile, JSON.stringify(stillPendingReminders, null, 2));
+        } catch (writeErr) {
+            console.error("[REMINDER] Lỗi ghi lại file nhắc nhở:", writeErr);
+        }
+    }
+}
+
+async function getWeatherData(city) {
+    if (!OPENWEATHERMAP_API_KEY || OPENWEATHERMAP_API_KEY === "YOUR_OPENWEATHERMAP_API_KEY") {
+        return "Tính năng thời tiết chưa được cài đặt API Key. Admin ơi, giúp Tường với!";
+    }
+    try {
+        const response = await axios.get(`http://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(city)}&appid=${OPENWEATHERMAP_API_KEY}&units=metric&lang=vi`);
+        const data = response.data;
+        if (data.cod && data.cod.toString() !== "200") {
+             return `Tường không tìm thấy thông tin thời tiết cho "${city}" (Lỗi: ${data.message || data.cod}). Bạn thử lại tên khác xem?`;
+        }
+        const weather = data.weather[0];
+        return `☀️ Thời tiết tại ${data.name}, ${data.sys.country} 🌡️\n` +
+               `- Hiện tại: ${Math.round(data.main.temp)}°C, ${weather.description}\n` +
+               `- Cảm giác như: ${Math.round(data.main.feels_like)}°C\n` +
+               `- Độ ẩm: ${data.main.humidity}%\n` +
+               `- Gió: ${data.wind.speed} m/s (hướng ${data.wind.deg}°)\n` +
+               `- Mây: ${data.clouds.all}%\n` +
+               `- Tầm nhìn: ${data.visibility ? data.visibility/1000 + ' km' : 'Không rõ'}\n` +
+               `- Bình minh: ${new Date(data.sys.sunrise * 1000).toLocaleTimeString("vi-VN")}\n` +
+               `- Hoàng hôn: ${new Date(data.sys.sunset * 1000).toLocaleTimeString("vi-VN")}`;
+    } catch (error) {
+        console.error("Lỗi lấy thời tiết cho '"+city+"':", error.response?.data?.message || error.message);
+        return `Tường không lấy được dữ liệu thời tiết cho "${city}" rồi. Bạn thử lại tên thành phố khác xem sao. Có thể tên thành phố không đúng hoặc API Key có vấn đề.`;
+    }
+}
+
+// --- MODULE EXPORTS ---
+module.exports.config = {
+  name: "tuong",
+  version: "8.4.0", // On/Off logic refinement
+  hasPermssion: 0,
+  credits: "PCODER & Kenne400k & Your Name (Mega Update)",
+  description: "Tường AI v8.4 - Logic On/Off cải tiến, Nhắc nhở, Thời tiết, Game, Help, Mood, QR, Media!",
+  commandCategory: "ai",
+  usages: [
+    "tuong [nội dung] - Chat AI (khi AutoAI tắt hoặc muốn ra lệnh trực tiếp)",
+    "tuong on/off/bật/tắt - Bật/tắt chế độ tự động trả lời trong nhóm.",
+    "tuong status/trạng thái - Kiểm tra trạng thái AutoAI.",
+    "gửi video/nhạc/gif [từ khóa] - Tìm và chọn media.",
+    "tuong ảnh mèo - Tìm ảnh mèo ngẫu nhiên.",
+    "tuong qr [link/văn bản] - Tạo QR cho văn bản/link.",
+    "tuong qr wifi (tên [SSID] pass [Mật khẩu] loại [WPA/WEP]) - Tạo QR Wi-Fi.",
+    "tuong qr liên hệ (tên [Tên] sđt [SĐT] mail [Email]) - Tạo QR vCard.",
+    "tuong qr vị trí (lat [Vĩ độ] lon [Kinh độ] nhãn [Tên]) - Tạo QR Geolocation.",
+    "tuong nhắc [tôi/tui] [lời nhắn] [vào lúc/sau] [thời gian] - Đặt nhắc nhở.",
+    "tuong ds nhắc nhở - Xem danh sách nhắc nhở của bạn.",
+    "tuong xóa nhắc nhở [ID] - Xóa nhắc nhở theo ID.",
+    "tuong thời tiết [thành phố] - Xem thời tiết.",
+    "tuong đoán số - Chơi game đoán số với Tường.",
+    "tuong help ([tên lệnh]) - Xem hướng dẫn sử dụng các lệnh của Tường.",
+    "tuong set mood [hài hước/nghiêm túc/dễ thương/mặc định] - Đặt tính cách cho Tường trong nhóm.",
+    "tuong set gu nhac [edm], [nhac tre] - Đặt sở thích nhạc của bạn.",
+    "(Reply vào ảnh) [tuong ơi] [câu hỏi về ảnh] - Hỏi Tường về nội dung ảnh được reply."
+  ],
+  cooldowns: 1,
+  dependencies: { "uuid": "", "axios": "", "fs-extra": "", "@distube/ytdl-core": "", "fluent-ffmpeg": "", "qs": "" }
+};
+
+module.exports.onLoad = async function({ api }) { // api object được truyền vào đây
+  console.log("╔═════════════════════════════════════════╗");
+  console.log("║   Tường AI v8.4.0 - Sẵn sàng chiến đấu!  ║");
+  console.log("║      Logic On/Off, Nhắc nhở & More      ║");
+  console.log("╚═════════════════════════════════════════╝");
+  fs.ensureDirSync(VISION_CACHE_DIR);
+  fs.ensureDirSync(TMP_DIR);
+
+  try {
+    const currentUserID = api.getCurrentUserID(); 
+    if (currentUserID) BOT_ID = currentUserID; // Gán BOT_ID ở đây nếu getCurrentUserID là đồng bộ
+    // Nếu getCurrentUserID là async, bạn cần: BOT_ID = await api.getCurrentUserID();
+    console.log(`[INFO] BOT_ID đã được khởi tạo: ${BOT_ID}`);
+  } catch (e) { 
+    console.warn("[WARN] Không thể lấy BOT ID ngay khi onLoad (có thể api.getCurrentUserID là async hoặc chưa sẵn sàng). Sẽ thử lại trong handleEvent.");
+  }
+
+  setInterval(() => checkReminders(api), 60 * 1000);
+};
+
+module.exports.run = async function({ api, event, args }) {
+  const commandBodyWhenRun = args.join(" ");
+  // Khi lệnh được gọi bằng run (ví dụ: /tuong help), ta giả lập body như khi gọi qua handleEvent
+  const simulatedBody = `${this.config.name} ${commandBodyWhenRun}`.trim(); // this.config.name là "tuong"
+  const newEvent = {...event, body: simulatedBody }; 
+  return this.handleEvent({ api, event: newEvent });
+};
+
+module.exports.handleReply = async function ({ api, event, handleReply: hr }) { // Đổi tên handleReply thành hr để tránh nhầm lẫn
+  const { threadID, messageID, senderID, body } = event;
+  const { type, author, choices, mediaType, quality, originalQuery, step, qrData = {}, gameData = {} } = hr;
+
+  if (author !== senderID) return; 
+
+  switch (type) {
+    case "lyrics_youtube":
+      if (body.toLowerCase() === "lyrics" && hr.songTitle) {
+        api.unsendMessage(hr.messageID).catch(console.error);
+        const lyric = await searchLyrics(hr.songTitle);
+        return api.sendMessage(lyric, threadID, messageID);
+      }
+      break;
+    case "yt_choice":
+      api.unsendMessage(hr.messageID).catch(console.error);
+      if (body.toLowerCase() === "khác" || body.toLowerCase() === "k") {
+        return api.sendMessage(`Bạn muốn tìm lại ${mediaType === "mp3" ? "nhạc": "video"} với từ khóa nào khác hông? Gõ "gửi ${mediaType} [từ khóa mới]" nha.`, threadID, messageID);
+      }
+      const choiceIndex = parseInt(body.trim()) - 1;
+      if (choiceIndex >= 0 && choiceIndex < choices.length) {
+        const chosenVideo = choices[choiceIndex];
+        await downloadAndSendChosenMedia(api, threadID, messageID, senderID, chosenVideo, mediaType, quality);
+      } else {
+        api.sendMessage("Lựa chọn không hợp lệ rồi bạn ơi. Bạn thử lại số khác nha!", threadID, messageID);
+      }
+      break;
+    
+    case "qr_interactive":
+      const userAnswer = body.trim();
+      if (userAnswer.toLowerCase() === "hủy" || userAnswer.toLowerCase() === "cancel") {
+        api.unsendMessage(hr.messageID).catch(console.error);
+        return api.sendMessage("Đã hủy tạo QR nha bạn.", threadID, messageID);
+      }
+      let nextStep = "";
+      let promptMsg = "";
+      let currentQrData = { ...qrData };
+
+      switch (step) {
+        case "wifi_ssid":
+          currentQrData.ssid = userAnswer; nextStep = "wifi_pass";
+          promptMsg = `OK, tên WiFi là "${userAnswer}". Giờ cho Tường xin mật khẩu (nếu không có pass, gõ "không" hoặc "nopass"):`;
+          break;
+        case "wifi_pass":
+          currentQrData.pass = (userAnswer.toLowerCase() === "không" || userAnswer.toLowerCase() === "nopass") ? "" : userAnswer;
+          nextStep = "wifi_type_finish";
+          promptMsg = `Đã có mật khẩu. Loại mã hóa là gì bạn ha? (WPA, WEP, hoặc gõ "không" nếu không rõ/mặc định WPA):`;
+          break;
+        case "wifi_type_finish":
+          api.unsendMessage(hr.messageID).catch(console.error);
+          currentQrData.wifiType = (userAnswer.toUpperCase() === "WEP" || userAnswer.toUpperCase() === "NOPASS") ? userAnswer.toUpperCase() : "WPA";
+          if (userAnswer.toLowerCase() === "không") currentQrData.wifiType = "WPA";
+          const wifiQrStr = `WIFI:T:${currentQrData.wifiType};S:${currentQrData.ssid};P:${currentQrData.pass};;`;
+          return sendGeneratedQrCode(api, threadID, messageID, wifiQrStr, `📱 QR WiFi cho "${currentQrData.ssid}" đây bạn ơi!`);
+
+        case "vcard_name":
+          currentQrData.name = userAnswer; nextStep = "vcard_phone";
+          promptMsg = `Tên: "${userAnswer}". Số điện thoại di động là gì bạn nhỉ?`;
+          break;
+        case "vcard_phone":
+          currentQrData.phone = userAnswer; nextStep = "vcard_email_finish";
+          promptMsg = `SĐT: "${userAnswer}". Email của họ là gì? (Gõ "không" nếu không có):`;
+          break;
+        case "vcard_email_finish":
+          api.unsendMessage(hr.messageID).catch(console.error);
+          if (userAnswer.toLowerCase() !== "không") currentQrData.email = userAnswer;
+          let vCardStr = `BEGIN:VCARD\nVERSION:3.0\nFN:${currentQrData.name}\nTEL;TYPE=CELL:${currentQrData.phone}`;
+          if (currentQrData.email) vCardStr += `\nEMAIL:${currentQrData.email}`; vCardStr += `\nEND:VCARD`;
+          return sendGeneratedQrCode(api, threadID, messageID, vCardStr, `👤 QR vCard cho "${currentQrData.name}" đây:`);
+
+        case "geo_lat":
+          currentQrData.lat = userAnswer; nextStep = "geo_lon";
+          promptMsg = `Vĩ độ: ${userAnswer}. Giờ cho Tường xin Kinh độ (Longitude):`;
+          break;
+        case "geo_lon":
+          currentQrData.lon = userAnswer; nextStep = "geo_label_finish";
+          promptMsg = `Kinh độ: ${userAnswer}. Bạn có muốn thêm nhãn (tên địa điểm) không? (Gõ "không" nếu không muốn):`;
+          break;
+        case "geo_label_finish":
+          api.unsendMessage(hr.messageID).catch(console.error);
+          if (userAnswer.toLowerCase() !== "không") currentQrData.label = userAnswer;
+          let geoQrStr = `geo:${currentQrData.lat},${currentQrData.lon}`;
+          if (currentQrData.label) geoQrStr += `?q=${encodeURIComponent(currentQrData.label)}`;
+          return sendGeneratedQrCode(api, threadID, messageID, geoQrStr, `📍 QR vị trí ${currentQrData.label ? `"${currentQrData.label}"` : `(${currentQrData.lat}, ${currentQrData.lon})`} đây:`);
+        default:
+            api.unsendMessage(hr.messageID).catch(console.error);
+            return api.sendMessage("Có lỗi trong quá trình tạo QR tương tác. Bạn thử lại từ đầu nha.", threadID, messageID);
+      }
+      if (nextStep && promptMsg) {
+        api.unsendMessage(hr.messageID).catch(console.error);
+        api.sendMessage(promptMsg, threadID, (e, i) => {
+            if (e) return console.error("Lỗi gửi câu hỏi QR interactive:", e);
+            if (global.client && global.client.handleReply && i) {
+                global.client.handleReply.push({ name: module.exports.config.name, messageID: i.messageID, author: senderID, type: "qr_interactive", step: nextStep, qrData: currentQrData });
+            }
+        }, messageID);
+      }
+      break;
+    
+    case "game_guess_number":
+      const guess = parseInt(body.trim());
+      if (body.toLowerCase() === "bỏ cuộc") {
+        api.unsendMessage(hr.messageID).catch(console.error);
+        return api.sendMessage(`Tiếc quá, bạn đã bỏ cuộc. Số Tường nghĩ là ${gameData.target} đó. Lần sau chơi tiếp nha!`, threadID, messageID);
+      }
+      if (isNaN(guess)) {
+        return api.sendMessage("Bạn đoán số mà, nhập số đi chứ! (Hoặc 'bỏ cuộc')", threadID, messageID);
+      }
+      gameData.attempts++;
+      if (guess === gameData.target) {
+        api.unsendMessage(hr.messageID).catch(console.error);
+        api.sendMessage(`🎉 Bingo! Số Tường nghĩ chính là ${gameData.target}. Bạn đoán trúng sau ${gameData.attempts} lần. Siêu quá!`, threadID, messageID);
+      } else {
+        const hint = guess < gameData.target ? "Lớn hơn một chút nữa!" : "Nhỏ hơn xíu thôi!";
+        api.unsendMessage(hr.messageID).catch(e => console.warn("Lỗi unsend game msg (có thể do đã bị xóa):", e.message));
+        api.sendMessage(`${hint} Đoán tiếp nha. (Lần đoán thứ ${gameData.attempts}, gõ 'bỏ cuộc' để dừng)`, threadID, (e, i) => {
+          if (e) return console.error(e);
+          if (global.client && global.client.handleReply && i) {
+            global.client.handleReply.push({ ...hr, messageID: i.messageID, gameData }); // Push lại với messageID mới
+          }
+        }, messageID);
+      }
+      break;
+    default:
+        // console.log(`[HandleReply] Không khớp type nào cho: ${type}`);
+        break;
+  }
+};
+
+// =======================================================================================
+// ================================ HANDLE EVENT (TRUNG TÂM) ==============================
+// =======================================================================================
+module.exports.handleEvent = async function({ api, event }) {
+  const { threadID, messageID, senderID, body = "", attachments = [], messageReply } = event;
+  const userKey = `${threadID}_${senderID}`;
+
+  if (!BOT_ID && api && typeof api.getCurrentUserID === 'function') {
+      try {
+          const currentID = api.getCurrentUserID();
+          if (currentID) BOT_ID = currentID;
+      } catch (e) { console.error("[ERROR] Không thể lấy BOT ID trong handleEvent:", e); }
+  }
+
+  if (!userData[userKey]) userData[userKey] = { music: [], video: [], gu: {}, xungho: "bạn", nick: "", mood: "vui vẻ", memory: [] };
+  if (!activeConversations[threadID]) activeConversations[threadID] = {};
+  if (!groupData[threadID]) groupData[threadID] = { personality: "mặc định" };
+
+  const bodyLower = body.toLowerCase();
+  const now = Date.now();
+  const bodyParts = bodyLower.split(/\s+/);
+  const commandPrefix = TUONGS.find(t => bodyParts[0] === t); // t đã là lowercase
+
+  // --- 1. XỬ LÝ LỆNH ON/OFF/STATUS (ƯU TIÊN CAO NHẤT) ---
+  if (commandPrefix && bodyParts.length > 1 && ["on", "off", "bật", "tắt", "status", "trạng thái"].includes(bodyParts[1].toLowerCase()) ) {
+    const action = bodyParts[1].toLowerCase();
+    const currentAutoAIState = autoAI[threadID] === true;
+
+    if (action === "on" || action === "bật") {
+      if (currentAutoAIState) {
+        return api.sendMessage("🟢 Tường đã bật rồi mà bạn ơi! Vẫn đang hóng chuyện đây. 😉", threadID, messageID);
+      } else {
+        autoAI[threadID] = true; saveData('autoAI');
+        if (activeConversations[threadID]) activeConversations[threadID] = {};
+        return api.sendMessage("🟢 Đã bật chế độ tự động trả lời cho nhóm này! Tường sẽ lắng nghe tất cả nha. 🥳", threadID, messageID);
+      }
+    } else if (action === "off" || action === "tắt") {
+      if (!currentAutoAIState) {
+        if(autoAI[threadID] === undefined) { autoAI[threadID] = false; saveData('autoAI'); }
+        return api.sendMessage("🔴 Tường đang ở chế độ không tự động trả lời rồi. Cần gì cứ gọi \"Tường\" nhé! 😊", threadID, messageID);
+      } else {
+        autoAI[threadID] = false; saveData('autoAI');
+        if (activeConversations[threadID]) activeConversations[threadID] = {};
+        return api.sendMessage("🔴 Đã tắt chế độ tự động trả lời. Gọi \"Tường ơi\" hoặc reply Tường thì Tường mới trả lời nha! 👋", threadID, messageID);
+      }
+    } else if (action === "status" || action === "trạng thái") {
+      if (currentAutoAIState) {
+        return api.sendMessage(`🟢 Chế độ tự động của Tường đang BẬT trong nhóm này.`, threadID, messageID);
+      } else {
+        return api.sendMessage(`🔴 Chế độ tự động của Tường đang TẮT trong nhóm này.`, threadID, messageID);
+      }
+    }
+  }
+
+  // --- 2. XÁC ĐỊNH SHOULDRESPOND THEO LOGIC MỚI ---
+  let shouldRespond = false;
+  const isReplyToBotSpecific = messageReply && messageReply.senderID == BOT_ID;
+  const isAutoAiOn = autoAI[threadID] === true;
+  const isNameCalledGeneral = TUONGS.some(t => bodyLower.includes(t));
+
+  if (isAutoAiOn) {
+      shouldRespond = true;
+      const isActiveConvWhenOn = activeConversations[threadID]?.[senderID] > now;
+      if (BOT_ID && (isNameCalledGeneral || isActiveConvWhenOn || isReplyToBotSpecific)) {
+          if (!activeConversations[threadID]) activeConversations[threadID] = {};
+          activeConversations[threadID][senderID] = now + CONVERSATION_TIMEOUT_MS;
+      }
+  } else { // AutoAI is OFF
+      if (isNameCalledGeneral) {
+          shouldRespond = true;
+          // KHÔNG quản lý activeConversations khi AutoAI OFF để mỗi lần tương tác cần gọi tên lại.
+      }
+  }
+  
+  // --- 3. XỬ LÝ ẢNH ƯU TIÊN (NẾU SHOULDRESPOND LÀ TRUE) ---
+  if (shouldRespond) {
+    if (messageReply && messageReply.attachments?.length > 0 && messageReply.attachments[0].type === "photo") {
+      // Phải có text trong reply HOẶC gọi tên Tường để hỏi về ảnh (nếu chưa có commandPrefix)
+      // isNameCalledGeneral sẽ bao gồm cả trường hợp body có "tuong oi", commandPrefix là khi "tuong" đứng đầu.
+      const triggerQuestion = body.trim() || (isNameCalledGeneral ? "Phân tích ảnh này giúp Tường với." : "");
+      if (triggerQuestion) { 
+        const repliedPhotoUrl = messageReply.attachments[0].url;
+        api.sendMessage("🖼️ Bạn hỏi về ảnh được reply hả? Để Tường \"ngâm cứu\" xíu...", threadID, messageID);
+        try {
+          const imgPath = path.join(VISION_CACHE_DIR, `${Date.now()}-${senderID}-replied.jpg`);
+          const res = await axios.get(repliedPhotoUrl, { responseType: "arraybuffer" });
+          fs.writeFileSync(imgPath, res.data);
+          let visionPrompt = `Bạn là Tường AI, trợ lý ảo thông minh và thân thiện. Người dùng đã TRẢ LỜI một hình ảnh và hỏi: "${triggerQuestion}". Hãy phân tích kỹ hình ảnh và trả lời. QUAN TRỌNG: Nếu ảnh là mã QR, hãy giải thích ngắn gọn (2-3 câu) mã đó chứa gì (link, văn bản, v.v.) hoặc công dụng, không mô tả dài dòng các chi tiết không liên quan như nút bấm trên màn hình. Giọng điệu dễ thương nhé!`;
+          const geminiResponse = await geminiVisionRequest({ prompt: visionPrompt, imagePath: imgPath, threadID });
+          api.sendMessage(`🤖 Tường AI "soi" được từ ảnh bạn reply:\n\n${geminiResponse}`, threadID, () => { try {fs.unlinkSync(imgPath);} catch(e){console.warn("Lỗi xóa ảnh tạm (replied):", e.message);}}, messageID);
+          return;
+        } catch (e) { api.sendMessage(`Ối! Tường không xem được ảnh bạn reply rồi: ${e.message}`, threadID, messageID); return; }
+      }
+    }
+    if (attachments?.length > 0 && attachments[0].type === "photo" && !messageReply) { // Ảnh đính kèm mới, không phải reply
+      const imageUrl = attachments[0].url;
+      const userMessage = body.trim();
+      api.sendMessage("🖼️ Ooh Tường thấy có ảnh mới nè! Để Tường nghía qua...", threadID, messageID);
+      try {
+        const imgPath = path.join(VISION_CACHE_DIR, `${Date.now()}-${senderID}-attached.jpg`);
+        const res = await axios.get(imageUrl, { responseType: "arraybuffer" });
+        fs.writeFileSync(imgPath, res.data);
+        let visionPrompt = `Bạn là Tường AI, trợ lý ảo thông minh, thân thiện.`;
+        if (userMessage) visionPrompt += ` Người dùng gửi ảnh kèm lời nhắn: "${userMessage}". Hãy phân tích ảnh và phản hồi lời nhắn.`;
+        else visionPrompt += ` Người dùng gửi một hình ảnh. Hãy phân tích và mô tả chi tiết.`;
+        visionPrompt += ` QUAN TRỌNG: Nếu ảnh là mã QR, hãy giải thích ngắn gọn (2-3 câu) mã đó chứa gì (link, văn bản, v.v.) hoặc công dụng, không mô tả chi tiết không liên quan. Giọng điệu dễ thương!`;
+        const geminiResponse = await geminiVisionRequest({ prompt: visionPrompt, imagePath: imgPath, threadID });
+        api.sendMessage(`🤖 Sau khi "quét" ảnh bạn gửi, Tường thấy:\n\n${geminiResponse}`, threadID, () => { try {fs.unlinkSync(imgPath);} catch(e){console.warn("Lỗi xóa ảnh tạm (attached):", e.message);}}, messageID);
+        return;
+      } catch (e) { api.sendMessage(`Ặc! Tường xem ảnh bạn gửi không được: ${e.message}`, threadID, messageID); return; }
+    }
+  }
+  // --- KẾT THÚC XỬ LÝ ẢNH ---
+
+  // --- 4. GATE CHÍNH CHO CÁC LỆNH CÒN LẠI ---
+  if (!shouldRespond) return;
+
+  // --- 5. KHAI BÁO actualCmdBody ---
+  const actualCmdBody = commandPrefix ? body.substring(commandPrefix.length).trim().toLowerCase() : bodyLower;
+
+  // --- 6. XỬ LÝ CÁC LỆNH CỤ THỂ KHÁC ---
+
+  // LỆNH HELP
+  if ((commandPrefix && actualCmdBody.startsWith("help")) || (!commandPrefix && isAutoAiOn && bodyLower.startsWith("help"))) {
+    const helpArg = (commandPrefix ? actualCmdBody.substring("help".length).trim() : bodyLower.substring("help".length).trim());
+    let helpMsg = "✨ **Tường AI Helper** ✨\n\n";
+    if (!helpArg) {
+        helpMsg += "Chào bạn, Tường có thể giúp gì nè? Dưới đây là một số lệnh Tường biết làm:\n";
+        const categories = {};
+        const sortedUsages = [...module.exports.config.usages].sort((a, b) => a.localeCompare(b));
+        sortedUsages.forEach(usageFull => {
+            const [usage, desc] = usageFull.split(" - ");
+            let category = "Khác";
+            if (usage.includes("qr")) category = "Tạo QR Code";
+            else if (usage.includes("nhắc")) category = "Nhắc Nhở";
+            else if (usage.includes("thời tiết")) category = "Thời Tiết";
+            else if (usage.includes("game") || usage.includes("đoán số")) category = "Giải Trí";
+            else if (usage.includes("mood")) category = "Cài Đặt Tường";
+            else if (usage.includes("video") || usage.includes("nhạc") || usage.includes("gif") || usage.includes("ảnh")) category = "Media";
+            else if (usage.includes("lyrics")) category = "Lời Bài Hát";
+            else if (usage.includes("gu nhac")) category = "Cá Nhân Hóa";
+            else if (usage.includes("on/off") || usage.includes("status")) category = "Điều Khiển Bot";
+            if (!categories[category]) categories[category] = [];
+            categories[category].push(`- \`${usage}\`${desc ? `: ${desc}` : ''}`);
+        });
+        const categoryOrder = ["Điều Khiển Bot", "Media", "Tạo QR Code", "Nhắc Nhở", "Thời Tiết", "Giải Trí", "Cá Nhân Hóa", "Cài Đặt Tường", "Lời Bài Hát", "Khác"];
+        for (const category of categoryOrder) {
+            if (categories[category]) {
+                helpMsg += `\n💠 **${category.toUpperCase()}**:\n${categories[category].join("\n")}`;
+            }
+        }
+        if (categories["Khác"] && !categoryOrder.includes("Khác")) {
+             helpMsg += `\n💠 **KHÁC**:\n${categories["Khác"].join("\n")}`;
+        }
+        helpMsg += "\n\n💡 Gõ `tuong help [tên lệnh]` để xem chi tiết hơn (ví dụ: `tuong help qr`).";
+    } else {
+        const foundUsages = module.exports.config.usages.filter(u => 
+            u.toLowerCase().split(" - ")[0].includes(helpArg.toLowerCase()) || 
+            u.toLowerCase().split(" - ")[1]?.toLowerCase().includes(helpArg.toLowerCase())
+        );
+        if (foundUsages.length > 0) {
+            helpMsg += `🔍 Hướng dẫn cho lệnh liên quan đến "${helpArg}":\n`;
+            foundUsages.forEach(u => helpMsg += `- ${u}\n`);
+        } else {
+             helpMsg += `Tường không tìm thấy lệnh nào khớp với "${helpArg}" cả. Bạn thử lại với từ khóa khác hoặc xem \`tuong help\` nha.`;
+        }
+    }
+    return api.sendMessage(helpMsg, threadID, messageID);
+  }
+  
+  // LỆNH SET MOOD (Cần "tuong")
+  if (commandPrefix && actualCmdBody.startsWith("set mood")) {
+    const newMood = actualCmdBody.substring("set mood".length).trim().toLowerCase();
+    const validMoods = ["mặc định", "hài hước", "nghiêm túc", "dễ thương"];
+    if (validMoods.includes(newMood)) {
+        if (!groupData[threadID]) groupData[threadID] = {};
+        groupData[threadID].personality = newMood;
+        saveData('groupData');
+        return api.sendMessage(`Okie! Từ giờ Tường sẽ chuyển sang mood "${newMood}" trong nhóm này nha. 😉`, threadID, messageID);
+    } else {
+        return api.sendMessage(`Tường chưa có mood "${newMood}" đâu. Bạn thử các mood: ${validMoods.join(", ")}.`, threadID, messageID);
+    }
+  }
+
+  // LỆNH NHẮC NHỞ (Cần "tuong")
+  if (commandPrefix && actualCmdBody.startsWith("nhắc")) {
+      const reminderTextRaw = body.substring(commandPrefix.length).trim();
+      const reminderTextClean = reminderTextRaw.replace(/^nhắc\s+(tôi|tui)\s+/i, "").trim();
+      const timeMatch = reminderTextClean.match(/(.+?)\s+(vào lúc|sau)\s+(.+)$/i);
+      if (timeMatch) {
+          const messageToRemind = timeMatch[1].trim();
+          const timeInstruction = timeMatch[3].trim();
+          const reminderTime = parseTime(timeInstruction);
+          if (reminderTime && reminderTime > Date.now()) {
+              const userInfo = await api.getUserInfo(senderID).catch(e => {console.warn("Không thể lấy userInfo cho nhắc nhở:", e); return {[senderID]: {name: senderID.toString()}};});
+              const userName = userInfo[senderID]?.name || senderID.toString();
+              const newReminder = {
+                  id: uuidv4(), userID: senderID, userName: userName, threadID: threadID,
+                  time: reminderTime, message: messageToRemind, originalCommand: body, createdAt: Date.now()
+              };
+              let currentReminders = [];
+              try { currentReminders = JSON.parse(fs.readFileSync(remindersFile, 'utf-8')); } catch (e) {}
+              currentReminders.push(newReminder);
+              fs.writeFileSync(remindersFile, JSON.stringify(currentReminders, null, 2));
+              return api.sendMessage(`Okie ${userName}, Tường sẽ nhắc bạn "${messageToRemind}" vào lúc ${new Date(reminderTime).toLocaleString("vi-VN")}.`, threadID, messageID);
+          } else if (reminderTime && reminderTime <= Date.now()) { return api.sendMessage("Ui, thời gian bạn chọn đã qua mất rồi. Chọn thời điểm trong tương lai nha!", threadID, messageID); } 
+          else { return api.sendMessage("Tường chưa hiểu thời gian bạn muốn nhắc. Bạn thử lại với kiểu như 'sau X phút/giờ/ngày' hoặc 'HH:MM [DD/MM/YYYY]' xem sao.", threadID, messageID); }
+      } else { return api.sendMessage("Cú pháp nhắc nhở là: `tuong nhắc tôi [lời nhắn] vào lúc/sau [thời gian]` nha.", threadID, messageID); }
+  }
+  if ((commandPrefix && (actualCmdBody.startsWith("ds nhắc nhở") || actualCmdBody.startsWith("xem nhắc nhở"))) || 
+      (!commandPrefix && isAutoAiOn && (bodyLower.startsWith("ds nhắc nhở") || bodyLower.startsWith("xem nhắc nhở")))) {
+      let currentReminders = []; try { currentReminders = JSON.parse(fs.readFileSync(remindersFile, 'utf-8')); } catch (e) {}
+      const userReminders = currentReminders.filter(r => r.userID === senderID && r.threadID === threadID);
+      if (userReminders.length === 0) return api.sendMessage("Bạn chưa có nhắc nhở nào với Tường trong nhóm này hết.", threadID, messageID);
+      let replyMsg = "📝 Đây là danh sách nhắc nhở của bạn (sắp xếp theo thời gian):\n";
+      userReminders.sort((a,b) => a.time - b.time).forEach(r => { replyMsg += `\n- ID: \`${r.id.substring(0,6)}\`\n  Nội dung: "${r.message}"\n  Thời gian: ${new Date(r.time).toLocaleString("vi-VN")}\n`; });
+      replyMsg += "\nDùng `tuong xóa nhắc nhở [ID]` để xóa nha.";
+      return api.sendMessage(replyMsg, threadID, messageID);
+  }
+  if ((commandPrefix && actualCmdBody.startsWith("xóa nhắc nhở")) || (!commandPrefix && isAutoAiOn && bodyLower.startsWith("xóa nhắc nhở"))) {
+      const idToDelete = (commandPrefix ? actualCmdBody.substring("xóa nhắc nhở".length).trim() : bodyLower.substring("xóa nhắc nhở".length).trim());
+      if (!idToDelete) return api.sendMessage("Bạn muốn xóa nhắc nhở có ID nào? Gõ `tuong ds nhắc nhở` để xem ID nha.", threadID, messageID);
+      let currentReminders = []; try { currentReminders = JSON.parse(fs.readFileSync(remindersFile, 'utf-8')); } catch (e) {}
+      const initialLength = currentReminders.length;
+      const filteredReminders = currentReminders.filter(r => !(r.id.startsWith(idToDelete) && r.userID === senderID && r.threadID === threadID));
+      if (filteredReminders.length < initialLength) {
+          fs.writeFileSync(remindersFile, JSON.stringify(filteredReminders, null, 2));
+          return api.sendMessage(`Đã xóa nhắc nhở có ID khớp với "${idToDelete}" của bạn.`, threadID, messageID);
+      } else { return api.sendMessage(`Không tìm thấy nhắc nhở nào có ID khớp "${idToDelete}" của bạn để xóa.`, threadID, messageID); }
+  }
+
+  // LỆNH THỜI TIẾT
+  if ((commandPrefix && actualCmdBody.startsWith("thời tiết")) || (!commandPrefix && isAutoAiOn && bodyLower.startsWith("thời tiết"))) {
+      const city = (commandPrefix ? actualCmdBody.substring("thời tiết".length).trim() : bodyLower.substring("thời tiết".length).trim());
+      if (!city) return api.sendMessage("Bạn muốn xem thời tiết ở thành phố nào nè?", threadID, messageID);
+      const weatherInfo = await getWeatherData(city);
+      return api.sendMessage(weatherInfo, threadID, messageID);
+  }
+
+  // LỆNH GAME ĐOÁN SỐ
+  if ((commandPrefix && actualCmdBody === "đoán số") || (!commandPrefix && isAutoAiOn && bodyLower === "đoán số")) {
+      const targetNumber = Math.floor(Math.random() * 100) + 1;
+      const gameData = { target: targetNumber, attempts: 0, threadID: threadID };
+      api.sendMessage("Okie, chơi đoán số nha! Tường đã nghĩ một số từ 1 đến 100 rồi đó. Bạn đoán thử xem? (Gõ 'bỏ cuộc' để dừng)", threadID, (e, i) => {
+          if (e) return console.error("Lỗi gửi game đoán số:", e);
+          if (global.client && global.client.handleReply && i) {
+            global.client.handleReply.push({ name: module.exports.config.name, messageID: i.messageID, author: senderID, type: "game_guess_number", gameData });
+          }
+      }, messageID);
+      return;
+  }
+
+  // XỬ LÝ QR (Chỉ chạy nếu có "tuong" hoặc autoAI on)
+  const qrTriggerWord = commandPrefix ? actualCmdBody : bodyLower; // Input để check có "qr" không
+  if (qrTriggerWord.startsWith("qr ") || qrTriggerWord.startsWith("qrcode ")) {
+      const qrCmdPart = qrTriggerWord.startsWith("qr ") ? qrTriggerWord.substring("qr ".length).trim() : qrTriggerWord.substring("qrcode ".length).trim();
+      if (qrCmdPart !== null) {
+        let qrContentInput = qrCmdPart;
+        // ... (Toàn bộ logic QR như phiên bản trước, bao gồm wifi, contact, geo, link, text, và interactive mode)
+        // Đảm bảo các nhánh đều có return. Ví dụ:
+        if (!qrContentInput || qrContentInput === "help" || qrContentInput === "giúp") { /* ... help QR ... */ return; }
+        const wifiKeyword = "wifi"; const wifiFullPattern = /wifi\s+tên\s+([^;,\n]+)\s+pass\s+([^;,\n]+)(?:\s+loại\s+(WPA|WEP|nopass))?/i; let match = qrContentInput.match(wifiFullPattern);
+        if (match) { const [, ssid, pass, type = "WPA"] = match; const qrData = `WIFI:T:${type.toUpperCase()};S:${ssid.trim()};P:${pass.trim()};;`; return sendGeneratedQrCode(api, threadID, messageID, qrData, `📱 QR code để kết nối WiFi "${ssid.trim()}" đây!`);} 
+        else if (qrContentInput.toLowerCase().startsWith(wifiKeyword)) { return api.sendMessage("OK, tạo QR WiFi nha. Tên WiFi (SSID) là gì bạn ơi?", threadID, (e, i) => {if(i)global.client.handleReply.push({ name: module.exports.config.name, messageID: i.messageID, author: senderID, type: "qr_interactive", step: "wifi_ssid", qrData: {} });}, messageID);}
+        // Tương tự cho contact, geo...
+        const contactKeyword = "liên hệ"; const contactFullPattern = /liên hệ\s+tên\s+([^;,\n]+)\s+sđt\s+([^;,\n]+)(?:\s+mail\s+([^;,\n]+))?/i; match = qrContentInput.match(contactFullPattern);
+        if (match) {const [, name, phone, email] = match; let vCard = `BEGIN:VCARD\nVERSION:3.0\nFN:${name.trim()}\nTEL;TYPE=CELL:${phone.trim()}`; if (email) vCard += `\nEMAIL:${email.trim()}`; vCard += `\nEND:VCARD`; return sendGeneratedQrCode(api, threadID, messageID, vCard, `👤 QR vCard cho "${name.trim()}" đây:`);}
+        else if (qrContentInput.toLowerCase().startsWith(contactKeyword) || qrContentInput.toLowerCase().startsWith("danh bạ")) { return api.sendMessage("OK, tạo QR danh bạ (vCard). Cho Tường xin tên đầy đủ của người đó:", threadID, (e,i) => {if(i)global.client.handleReply.push({name:module.exports.config.name, messageID:i.messageID, author:senderID, type:"qr_interactive", step:"vcard_name",qrData:{}});}, messageID);}
+        const locationKeyword = "vị trí"; const locationFullPattern = /vị trí\s+lat\s+([-\d.]+)\s+lon\s+([-\d.]+)(?:\s+nhãn\s+(.+))?/i; match = qrContentInput.match(locationFullPattern);
+        if (match) {const [, lat, lon, label] = match; let geoStr = `geo:${lat.trim()},${lon.trim()}`; if (label) geoStr += `?q=${encodeURIComponent(label.trim())}`; return sendGeneratedQrCode(api, threadID, messageID, geoStr, `📍 QR vị trí ${label ? `"${label.trim()}"` : `(${lat.trim()}, ${lon.trim()})`} đây:`);}
+        else if (qrContentInput.toLowerCase().startsWith(locationKeyword) || qrContentInput.toLowerCase().startsWith("map") || qrContentInput.toLowerCase().startsWith("bản đồ")) { return api.sendMessage("OK, tạo QR vị trí (Geolocation). Vĩ độ (Latitude) là bao nhiêu bạn nhỉ?", threadID, (e,i) => {if(i)global.client.handleReply.push({name:module.exports.config.name,messageID:i.messageID,author:senderID,type:"qr_interactive",step:"geo_lat",qrData:{}});}, messageID);}
+        
+        if (/^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/i.test(qrContentInput)) {
+          const url = qrContentInput.startsWith("http") ? qrContentInput : `http://${qrContentInput}`;
+          return sendGeneratedQrCode(api, threadID, messageID, url, `🔗 QR code cho link "${url.substring(0, 70)}${url.length > 70 ? '...' : ''}" nè:`);
+        } else if (qrContentInput) {
+          return sendGeneratedQrCode(api, threadID, messageID, qrContentInput, `📝 QR code cho văn bản "${qrContentInput.substring(0, 70)}${qrContentInput.length > 70 ? '...' : ''}" đây:`);
+        }
+        return; // Return nếu đã vào logic QR và không match gì thêm
+      }
+  }
+
+  // MEDIA, LYRICS, GU
+  // parseMediaRequest cần body gốc để phân tích đúng các từ khóa không có "tuong" đầu
+  const mediaRequestData = parseMediaRequest(body); 
+  if (mediaRequestData) { // Nếu parseMediaRequest trả về gì đó
+      // Chỉ xử lý media nếu có gọi tên Tường hoặc AutoAI đang bật
+      if (commandPrefix || isAutoAiOn) {
+          // Đặc biệt xử lý cho tìm ảnh mèo để nó được ưu tiên hơn ảnh chung (nếu có)
+          if (mediaRequestData.type === "img" && /(mèo|cat|meow)/i.test(mediaRequestData.query || "")) {
+              const catImgUrl = await catImage();
+              if (catImgUrl) return api.sendMessage({ body: " Ảnh mèo cute cho bạn nè 😻", attachment: await axios({ url: catImgUrl, responseType: "stream" }).then(r => r.data) }, threadID, messageID);
+              else return api.sendMessage("Huhu, Tường tìm ảnh mèo mà không thấy...", threadID, messageID);
+          }
+          // Các loại media khác hoặc ảnh không phải mèo
+          return sendMedia(api, event, mediaRequestData);
+      }
+  }
+  
+  if ((commandPrefix && actualCmdBody.startsWith("set gu nhac")) || (!commandPrefix && isAutoAiOn && bodyLower.startsWith("set gu nhac"))) { 
+    return handleGu(api, event, body, userKey); // handleGu cần body gốc để parse
+  }
+  
+  const lyricTriggerWord = commandPrefix ? actualCmdBody : bodyLower;
+  if (lyricTriggerWord.startsWith("lyrics ") || lyricTriggerWord.startsWith("lời bài hát ")) {
+    const songTitle = lyricTriggerWord.replace(/^(lyrics|lời bài hát)\s+/i, "").trim();
+    if (songTitle) {
+        const lyric = await searchLyrics(songTitle);
+        return api.sendMessage(lyric, threadID, messageID);
+    } else {
+        return api.sendMessage("Bạn muốn tìm lời bài hát nào nè? Gõ '[tuong] lyrics [tên bài hát]' nha.", threadID, messageID);
+    }
+  }
+  
+  // --- 7. AI TEXT MẶC ĐỊNH ---
+  if (body.trim() !== "" && shouldRespond) { 
+    if (commandPrefix && actualCmdBody === "") { // Nếu chỉ gõ "tuong"
+        return api.sendMessage("Tường nghe nè! Bạn muốn Tường làm gì? Gõ `tuong help` để xem các lệnh nha.", threadID, messageID);
+    }
+
+    // Tránh chat AI với các chuỗi có vẻ là lệnh nhưng không khớp hoàn toàn
+    const potentialCommandLookingStrings = ["help", "qr", "nhắc", "thời tiết", "đoán số", "set mood", "set gu", "lyrics", "video", "nhạc", "ảnh", "gif"];
+    if (commandPrefix && potentialCommandLookingStrings.some(cmd => actualCmdBody.startsWith(cmd) && actualCmdBody !== cmd)) {
+        // Có thể là gõ sai lệnh, không nên đưa vào chat AI ngay
+        // Có thể trả về một tin nhắn gợi ý help hoặc im lặng
+        // console.log(`[DEBUG] Có vẻ là lệnh gõ sai: ${actualCmdBody}, không đưa vào chat AI.`);
+    } else if (!commandPrefix && isAutoAiOn && potentialCommandLookingStrings.some(cmd => bodyLower.startsWith(cmd))) {
+        // Khi autoAI on, nếu user gõ "video abc" mà không khớp mediaReq, cũng không nên tự động chat AI
+        // console.log(`[DEBUG][AutoAI] Có vẻ là lệnh không khớp: ${bodyLower}, không đưa vào chat AI.`);
+    }
+    else { // Nếu không phải là các trường hợp trên, tiến hành chat AI
+        userData[userKey].memory.push({ time: Date.now(), text: body });
+        if (userData[userKey].memory.length > 10) userData[userKey].memory.shift();
+        
+        const aiReplyText = await getAIResponse(body, userData[userKey], userData[userKey].memory, "", threadID);
+        await api.sendMessage(aiReplyText, threadID, messageID);
+        return; 
+    }
+  }
+};

@@ -1,0 +1,2 @@
+module.exports.config = { name: "newCommand", version: "1.0.0", hasPermssion: 0, credits: "Your Name", description: "New command", commandCategory: "general", usages: "", cooldowns: 3 };
+module.exports.run = async function({ api, event, args }) { api.sendMessage("Hello from new command!", event.threadID, event.messageID); }
