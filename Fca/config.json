@@ -1,0 +1,37 @@
+{
+  "maxRetries": 50,
+  "retryDelay": 5000,
+  "sessionTimeout": 86400000,
+  "autoSaveAppstate": true,
+  "enableLogging": true,
+  "logLevel": "info",
+  "facebook": {
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+    "forceLogin": true,
+    "listenEvents": true,
+    "updatePresence": true,
+    "selfListen": false,
+    "autoMarkDelivery": false,
+    "autoMarkRead": false
+  },
+  "credentials": {
+    "email": "pcoder090@gmail.com",
+    "password": "Prophat123",
+    "appPassword": null,
+    "has2FA": false,
+    "updatedAt": "2025-06-01T21:01:43.415Z"
+  },
+  "security": {
+    "encryptCredentials": true,
+    "autoBackup": true,
+    "maxBackups": 10
+  },
+  "connection": {
+    "timeout": 30000,
+    "keepAlive": true,
+    "reconnectAttempts": 5,
+    "reconnectDelay": 5000
+  },
+  "bypassMode": true,
+  "autoReconnect": true
+}

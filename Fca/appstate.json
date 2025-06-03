@@ -1,0 +1,110 @@
+[
+	{
+		"key": "sb",
+		"value": "LVg7aCPHqyjIGG26xcjFl0S4",
+		"domain": "facebook.com",
+		"path": "/",
+		"hostOnly": false,
+		"creation": "2025-06-01T21:28:09.027Z",
+		"lastAccessed": "2025-06-01T21:28:09.027Z"
+	},
+	{
+		"key": "dpr",
+		"value": "1",
+		"domain": "facebook.com",
+		"path": "/",
+		"hostOnly": false,
+		"creation": "2025-06-01T21:28:09.027Z",
+		"lastAccessed": "2025-06-01T21:28:09.027Z"
+	},
+	{
+		"key": "m_pixel_ratio",
+		"value": "1",
+		"domain": "facebook.com",
+		"path": "/",
+		"hostOnly": false,
+		"creation": "2025-06-01T21:28:09.027Z",
+		"lastAccessed": "2025-06-01T21:28:09.027Z"
+	},
+	{
+		"key": "datr",
+		"value": "G7o8aHQxycqm-WPd3Y7zKIdy",
+		"domain": "facebook.com",
+		"path": "/",
+		"hostOnly": false,
+		"creation": "2025-06-01T21:28:09.027Z",
+		"lastAccessed": "2025-06-01T21:28:09.027Z"
+	},
+	{
+		"key": "wd",
+		"value": "981x723",
+		"domain": "facebook.com",
+		"path": "/",
+		"hostOnly": false,
+		"creation": "2025-06-01T21:28:09.027Z",
+		"lastAccessed": "2025-06-01T21:28:09.027Z"
+	},
+	{
+		"key": "locale",
+		"value": "vi_VN",
+		"domain": "facebook.com",
+		"path": "/",
+		"hostOnly": false,
+		"creation": "2025-06-01T21:28:09.027Z",
+		"lastAccessed": "2025-06-01T21:28:09.027Z"
+	},
+	{
+		"key": "ps_l",
+		"value": "1",
+		"domain": "facebook.com",
+		"path": "/",
+		"hostOnly": false,
+		"creation": "2025-06-01T21:28:09.027Z",
+		"lastAccessed": "2025-06-01T21:28:09.027Z"
+	},
+	{
+		"key": "ps_n",
+		"value": "1",
+		"domain": "facebook.com",
+		"path": "/",
+		"hostOnly": false,
+		"creation": "2025-06-01T21:28:09.027Z",
+		"lastAccessed": "2025-06-01T21:28:09.027Z"
+	},
+	{
+		"key": "c_user",
+		"value": "100094235645470",
+		"domain": "facebook.com",
+		"path": "/",
+		"hostOnly": false,
+		"creation": "2025-06-01T21:28:09.027Z",
+		"lastAccessed": "2025-06-01T21:28:09.027Z"
+	},
+	{
+		"key": "fr",
+		"value": "1QI7EUA84KRi3CtfQ.AWdXQg2Ee_V49qCbvfp7kFvp59XS5PgssmZyZdBQLNp5s1_K7Kc.BoPMSo..AAA.0.0.BoPMSo.AWckO_hXDjG_phOflPEKvJNMeQc",
+		"domain": "facebook.com",
+		"path": "/",
+		"hostOnly": false,
+		"creation": "2025-06-01T21:28:09.027Z",
+		"lastAccessed": "2025-06-01T21:28:09.027Z"
+	},
+	{
+		"key": "xs",
+		"value": "39%3AogmeIkC_q_dSiA%3A2%3A1748810747%3A-1%3A-1%3A%3AAcXT9W89M8kbAxxydClUh-zRb23lIFGUuD-7pRK7tw",
+		"domain": "facebook.com",
+		"path": "/",
+		"hostOnly": false,
+		"creation": "2025-06-01T21:28:09.027Z",
+		"lastAccessed": "2025-06-01T21:28:09.027Z"
+	},
+	{
+		"key": "presence",
+		"value": "C%7B%22lm3%22%3A%22g.9670612463055910%22%2C%22t3%22%3A%5B%5D%2C%22utc3%22%3A1748812999080%2C%22v%22%3A1%7D",
+		"domain": "facebook.com",
+		"path": "/",
+		"hostOnly": false,
+		"creation": "2025-06-01T21:28:09.027Z",
+		"lastAccessed": "2025-06-01T21:28:09.027Z"
+	}
+]

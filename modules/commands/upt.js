@@ -3,9 +3,26 @@ const moment = require('moment-timezone');
 const fs = require('fs');
 const path = require('path');
 const { createCanvas } = require('canvas');
+const { networkInterfaces } = require('os');
 
 const CACHE_DIR = path.join(__dirname, 'cache');
 if (!fs.existsSync(CACHE_DIR)) fs.mkdirSync(CACHE_DIR, { recursive: true });
+
+function getIpAddress() {
+    const nets = networkInterfaces();
+    let ip = 'Không xác định';
+    for (const name of Object.keys(nets)) {
+        for (const net of nets[name]) {
+            // Lấy IPv4 không phải nội bộ
+            if (net.family === 'IPv4' && !net.internal) {
+                ip = net.address;
+                break;
+            }
+        }
+        if (ip !== 'Không xác định') break;
+    }
+    return ip;
+}
 
 module.exports = {
     config: {
@@ -86,6 +103,7 @@ module.exports = {
         const osRelease = os.release();
         const osArch = os.arch();
         const prefix = global.config.PREFIX || ".";
+        const ipAddress = getIpAddress();
 
         // Canvas
         async function drawSystemCanvas() {
@@ -175,7 +193,8 @@ module.exports = {
                 { label: "Prefix:", value: prefix, color: labelCol },
                 { label: "Package:", value: dependencyCount >= 0 ? dependencyCount + " packages" : "Không xác định", color: labelCol },
                 { label: "Trạng thái:", value: botStatus, color: labelCol },
-                { label: "OS:", value: `${osType} ${osRelease} (${osArch})`, color: labelCol }
+                { label: "OS:", value: `${osType} ${osRelease} (${osArch})`, color: labelCol },
+                { label: "IP:", value: ipAddress, color: labelCol2 }
             ];
             let osY = 0;
             leftRows.forEach(row => {

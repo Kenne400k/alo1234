@@ -1,7 +1,7 @@
 const { existsSync, writeFileSync, mkdirSync, readFileSync, createReadStream } = global.nodemodule["fs-extra"];
 const pathModule = global.nodemodule["path"];
-const shortcutDataPath = pathModule.join(__dirname, '../../SystemData/data/shortcutdata.json');
-const shortcutFolderPath = pathModule.join(__dirname, '../../SystemData/data/shortcut');
+const shortcutDataPath = pathModule.join(__dirname, '../../pdata/SystemData/data/shortcutdata.json');
+const shortcutFolderPath = pathModule.join(__dirname, '../../pdata/SystemData/data/shortcut');
 
 module.exports.config = {
   name: "shortcut",

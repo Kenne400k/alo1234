@@ -6,7 +6,7 @@ const DATA_FOLDER = path.join(__dirname, "../../lekhanh/datajson/");
 const DOWNLOAD_FOLDER = path.join(__dirname, "../../lekhanh/datajson/");
 
 exports.config = {
-  name: "api",
+  name: "1api",
   version: "0.0.9",
   hasPermission: 0,
   credits: "Harin",

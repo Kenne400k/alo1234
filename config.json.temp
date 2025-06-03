@@ -12,17 +12,23 @@
     "commandDisabled": [],
     "eventDisabled": [],
     "UPTIME": 0,
+    "socks5": "socks5://os6u8kyercqfak2zxag2:lk69fpz1us5fdcdvtrgl@160.187.246.56:10001",
+    "socks5tl": true,
     "ACCESSTOKEN": "EAAD6V7os0gcBOwmZAZAfSYzhg1qspaMIXlPZAbgHd0XLbuOYfdzU5cOoGLgmFSKILYNw5uaGVHs5F4LjCGLgwbZBtxAoAZCiDAVKbn4sThgeuoX8i3UZClX0RZAXg5FNZAtdP7KkhO4Ew0e4XJrHgBcciC5Ovf48C9PNDepzbodDQmkDUfZBrfdFJD44EyuvjUpAMoCEdfCS6fQZDZD",
     "FACEBOOK_ADMIN": "https://www.facebook.com/pcoder090/",
     "ZALO_ADMIN": "",
     "ADMIN_NAME": "PCODER",
     "BOTNAME": "PCODER",
     "PREFIX": ".",
+    "DEVELOPERS": [
+        "100047128875560"
+    ],
     "ADMINBOT": [
         "100047128875560",
         "1053703548",
         "1053703548",
-        "100088866878939"
+        "100088866878939",
+        "61565066240548"
     ],
     "NDH": [
         "100047128875560"

@@ -1,0 +1,462 @@
+✖ [ PCODER ]  𝐅𝐚𝐢𝐥 autodown
+    → Error: Tên module bị trùng với một module mang cùng tên khác!
+    at /root/filebot1/ok/main.js:371:73
+    at /root/filebot1/ok/f/Main.js:1245:17
+    at tryCatcher (/root/filebot1/ok/f/node_modules/bluebird/js/release/util.js:16:23)
+    at Promise._settlePromiseFromHandler (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:547:31)
+    at Promise._settlePromise (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:604:18)
+    at Promise._settlePromise0 (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:649:10)
+    at Promise._settlePromises (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:729:18)
+    at Promise._fulfill (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:673:18)
+    at Promise._resolveCallback (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:466:57)
+    at Promise._settlePromiseFromHandler (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:559:17)
+    at Promise._settlePromise (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:604:18)
+    at Promise._settlePromise0 (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:649:10)
+    at Promise._settlePromises (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:729:18)
+    at Promise._fulfill (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:673:18)
+    at Promise._resolveCallback (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:466:57)
+    at Promise._settlePromiseFromHandler (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:559:17)
+
+✖ [ PCODER ]  𝐅𝐚𝐢𝐥 autosetname
+    → Error: Không thể khởi chạy setup của module autosetname, lỗi: autosetname
+    at /root/filebot1/ok/main.js:405:19
+    at /root/filebot1/ok/f/Main.js:1245:17
+    at tryCatcher (/root/filebot1/ok/f/node_modules/bluebird/js/release/util.js:16:23)
+    at Promise._settlePromiseFromHandler (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:547:31)
+    at Promise._settlePromise (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:604:18)
+    at Promise._settlePromise0 (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:649:10)
+    at Promise._settlePromises (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:729:18)
+    at Promise._fulfill (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:673:18)
+    at Promise._resolveCallback (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:466:57)
+    at Promise._settlePromiseFromHandler (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:559:17)
+    at Promise._settlePromise (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:604:18)
+    at Promise._settlePromise0 (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:649:10)
+    at Promise._settlePromises (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:729:18)
+    at Promise._fulfill (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:673:18)
+    at Promise._resolveCallback (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:466:57)
+    at Promise._settlePromiseFromHandler (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:559:17)
+
+✖ [ PCODER ]  𝐅𝐚𝐢𝐥 autoyt
+    → Error: Tên module bị trùng với một module mang cùng tên khác!
+    at /root/filebot1/ok/main.js:371:73
+    at /root/filebot1/ok/f/Main.js:1245:17
+    at tryCatcher (/root/filebot1/ok/f/node_modules/bluebird/js/release/util.js:16:23)
+    at Promise._settlePromiseFromHandler (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:547:31)
+    at Promise._settlePromise (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:604:18)
+    at Promise._settlePromise0 (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:649:10)
+    at Promise._settlePromises (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:729:18)
+    at Promise._fulfill (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:673:18)
+    at Promise._resolveCallback (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:466:57)
+    at Promise._settlePromiseFromHandler (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:559:17)
+    at Promise._settlePromise (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:604:18)
+    at Promise._settlePromise0 (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:649:10)
+    at Promise._settlePromises (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:729:18)
+    at Promise._fulfill (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:673:18)
+    at Promise._resolveCallback (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:466:57)
+    at Promise._settlePromiseFromHandler (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:559:17)
+
+✖ [ PCODER ]  𝐅𝐚𝐢𝐥 bauucua
+    → Error: Tên module bị trùng với một module mang cùng tên khác!
+    at /root/filebot1/ok/main.js:371:73
+    at /root/filebot1/ok/f/Main.js:1245:17
+    at tryCatcher (/root/filebot1/ok/f/node_modules/bluebird/js/release/util.js:16:23)
+    at Promise._settlePromiseFromHandler (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:547:31)
+    at Promise._settlePromise (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:604:18)
+    at Promise._settlePromise0 (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:649:10)
+    at Promise._settlePromises (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:729:18)
+    at Promise._fulfill (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:673:18)
+    at Promise._resolveCallback (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:466:57)
+    at Promise._settlePromiseFromHandler (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:559:17)
+    at Promise._settlePromise (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:604:18)
+    at Promise._settlePromise0 (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:649:10)
+    at Promise._settlePromises (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:729:18)
+    at Promise._fulfill (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:673:18)
+    at Promise._resolveCallback (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:466:57)
+    at Promise._settlePromiseFromHandler (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:559:17)
+
+✖ [ PCODER ]  𝐅𝐚𝐢𝐥 boxid
+    → Error: Tên module bị trùng với một module mang cùng tên khác!
+    at /root/filebot1/ok/main.js:371:73
+    at /root/filebot1/ok/f/Main.js:1245:17
+    at tryCatcher (/root/filebot1/ok/f/node_modules/bluebird/js/release/util.js:16:23)
+    at Promise._settlePromiseFromHandler (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:547:31)
+    at Promise._settlePromise (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:604:18)
+    at Promise._settlePromise0 (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:649:10)
+    at Promise._settlePromises (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:729:18)
+    at Promise._fulfill (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:673:18)
+    at Promise._resolveCallback (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:466:57)
+    at Promise._settlePromiseFromHandler (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:559:17)
+    at Promise._settlePromise (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:604:18)
+    at Promise._settlePromise0 (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:649:10)
+    at Promise._settlePromises (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:729:18)
+    at Promise._fulfill (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:673:18)
+    at Promise._resolveCallback (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:466:57)
+    at Promise._settlePromiseFromHandler (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:559:17)
+
+✖ [ PCODER ]  𝐅𝐚𝐢𝐥 capcut
+    → Error: Tên module bị trùng với một module mang cùng tên khác!
+    at /root/filebot1/ok/main.js:371:73
+    at /root/filebot1/ok/f/Main.js:1245:17
+    at tryCatcher (/root/filebot1/ok/f/node_modules/bluebird/js/release/util.js:16:23)
+    at Promise._settlePromiseFromHandler (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:547:31)
+    at Promise._settlePromise (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:604:18)
+    at Promise._settlePromise0 (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:649:10)
+    at Promise._settlePromises (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:729:18)
+    at Promise._fulfill (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:673:18)
+    at Promise._resolveCallback (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:466:57)
+    at Promise._settlePromiseFromHandler (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:559:17)
+    at Promise._settlePromise (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:604:18)
+    at Promise._settlePromise0 (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:649:10)
+    at Promise._settlePromises (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:729:18)
+    at Promise._fulfill (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:673:18)
+    at Promise._resolveCallback (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:466:57)
+    at Promise._settlePromiseFromHandler (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:559:17)
+
+✖ [ PCODER ]  𝐅𝐚𝐢𝐥 checkwed
+    → Error: Tên module bị trùng với một module mang cùng tên khác!
+    at /root/filebot1/ok/main.js:371:73
+    at /root/filebot1/ok/f/Main.js:1245:17
+    at tryCatcher (/root/filebot1/ok/f/node_modules/bluebird/js/release/util.js:16:23)
+    at Promise._settlePromiseFromHandler (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:547:31)
+    at Promise._settlePromise (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:604:18)
+    at Promise._settlePromise0 (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:649:10)
+    at Promise._settlePromises (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:729:18)
+    at Promise._fulfill (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:673:18)
+    at Promise._resolveCallback (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:466:57)
+    at Promise._settlePromiseFromHandler (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:559:17)
+    at Promise._settlePromise (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:604:18)
+    at Promise._settlePromise0 (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:649:10)
+    at Promise._settlePromises (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:729:18)
+    at Promise._fulfill (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:673:18)
+    at Promise._resolveCallback (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:466:57)
+    at Promise._settlePromiseFromHandler (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:559:17)
+
+✖ [ PCODER ]  𝐅𝐚𝐢𝐥 daily
+    → Error: Không thể khởi chạy setup của module daily, lỗi: daily
+    at /root/filebot1/ok/main.js:405:19
+    at /root/filebot1/ok/f/Main.js:1245:17
+    at tryCatcher (/root/filebot1/ok/f/node_modules/bluebird/js/release/util.js:16:23)
+    at Promise._settlePromiseFromHandler (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:547:31)
+    at Promise._settlePromise (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:604:18)
+    at Promise._settlePromise0 (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:649:10)
+    at Promise._settlePromises (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:729:18)
+    at Promise._fulfill (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:673:18)
+    at Promise._resolveCallback (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:466:57)
+    at Promise._settlePromiseFromHandler (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:559:17)
+    at Promise._settlePromise (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:604:18)
+    at Promise._settlePromise0 (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:649:10)
+    at Promise._settlePromises (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:729:18)
+    at Promise._fulfill (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:673:18)
+    at Promise._resolveCallback (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:466:57)
+    at Promise._settlePromiseFromHandler (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:559:17)
+
+✖ [ PCODER ]  𝐅𝐚𝐢𝐥 info1
+    → Error: Tên module bị trùng với một module mang cùng tên khác!
+    at /root/filebot1/ok/main.js:371:73
+    at /root/filebot1/ok/f/Main.js:1245:17
+    at tryCatcher (/root/filebot1/ok/f/node_modules/bluebird/js/release/util.js:16:23)
+    at Promise._settlePromiseFromHandler (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:547:31)
+    at Promise._settlePromise (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:604:18)
+    at Promise._settlePromise0 (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:649:10)
+    at Promise._settlePromises (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:729:18)
+    at Promise._fulfill (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:673:18)
+    at Promise._resolveCallback (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:466:57)
+    at Promise._settlePromiseFromHandler (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:559:17)
+    at Promise._settlePromise (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:604:18)
+    at Promise._settlePromise0 (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:649:10)
+    at Promise._settlePromises (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:729:18)
+    at Promise._fulfill (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:673:18)
+    at Promise._resolveCallback (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:466:57)
+    at Promise._settlePromiseFromHandler (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:559:17)
+
+✖ [ PCODER ]  𝐅𝐚𝐢𝐥 ngl
+    → Error: Tên module bị trùng với một module mang cùng tên khác!
+    at /root/filebot1/ok/main.js:371:73
+    at /root/filebot1/ok/f/Main.js:1245:17
+    at tryCatcher (/root/filebot1/ok/f/node_modules/bluebird/js/release/util.js:16:23)
+    at Promise._settlePromiseFromHandler (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:547:31)
+    at Promise._settlePromise (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:604:18)
+    at Promise._settlePromise0 (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:649:10)
+    at Promise._settlePromises (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:729:18)
+    at Promise._fulfill (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:673:18)
+    at Promise._resolveCallback (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:466:57)
+    at Promise._settlePromiseFromHandler (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:559:17)
+    at Promise._settlePromise (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:604:18)
+    at Promise._settlePromise0 (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:649:10)
+    at Promise._settlePromises (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:729:18)
+    at Promise._fulfill (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:673:18)
+    at Promise._resolveCallback (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:466:57)
+    at Promise._settlePromiseFromHandler (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:559:17)
+
+✖ [ PCODER ]  𝐅𝐚𝐢𝐥 runmoky
+    → Error: Tên module bị trùng với một module mang cùng tên khác!
+    at /root/filebot1/ok/main.js:371:73
+    at /root/filebot1/ok/f/Main.js:1245:17
+    at tryCatcher (/root/filebot1/ok/f/node_modules/bluebird/js/release/util.js:16:23)
+    at Promise._settlePromiseFromHandler (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:547:31)
+    at Promise._settlePromise (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:604:18)
+    at Promise._settlePromise0 (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:649:10)
+    at Promise._settlePromises (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:729:18)
+    at Promise._fulfill (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:673:18)
+    at Promise._resolveCallback (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:466:57)
+    at Promise._settlePromiseFromHandler (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:559:17)
+    at Promise._settlePromise (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:604:18)
+    at Promise._settlePromise0 (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:649:10)
+    at Promise._settlePromises (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:729:18)
+    at Promise._fulfill (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:673:18)
+    at Promise._resolveCallback (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:466:57)
+    at Promise._settlePromiseFromHandler (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:559:17)
+
+✖ [ PCODER ]  𝐅𝐚𝐢𝐥 sendnoti
+    → Error: Tên module bị trùng với một module mang cùng tên khác!
+    at /root/filebot1/ok/main.js:371:73
+    at /root/filebot1/ok/f/Main.js:1245:17
+    at tryCatcher (/root/filebot1/ok/f/node_modules/bluebird/js/release/util.js:16:23)
+    at Promise._settlePromiseFromHandler (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:547:31)
+    at Promise._settlePromise (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:604:18)
+    at Promise._settlePromise0 (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:649:10)
+    at Promise._settlePromises (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:729:18)
+    at Promise._fulfill (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:673:18)
+    at Promise._resolveCallback (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:466:57)
+    at Promise._settlePromiseFromHandler (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:559:17)
+    at Promise._settlePromise (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:604:18)
+    at Promise._settlePromise0 (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:649:10)
+    at Promise._settlePromises (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:729:18)
+    at Promise._fulfill (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:673:18)
+    at Promise._resolveCallback (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:466:57)
+    at Promise._settlePromiseFromHandler (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:559:17)
+
+✖ [ PCODER ]  𝐅𝐚𝐢𝐥 setprefix
+    → Error: Tên module bị trùng với một module mang cùng tên khác!
+    at /root/filebot1/ok/main.js:371:73
+    at /root/filebot1/ok/f/Main.js:1245:17
+    at tryCatcher (/root/filebot1/ok/f/node_modules/bluebird/js/release/util.js:16:23)
+    at Promise._settlePromiseFromHandler (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:547:31)
+    at Promise._settlePromise (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:604:18)
+    at Promise._settlePromise0 (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:649:10)
+    at Promise._settlePromises (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:729:18)
+    at Promise._fulfill (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:673:18)
+    at Promise._resolveCallback (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:466:57)
+    at Promise._settlePromiseFromHandler (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:559:17)
+    at Promise._settlePromise (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:604:18)
+    at Promise._settlePromise0 (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:649:10)
+    at Promise._settlePromises (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:729:18)
+    at Promise._fulfill (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:673:18)
+    at Promise._resolveCallback (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:466:57)
+    at Promise._settlePromiseFromHandler (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:559:17)
+
+✖ [ PCODER ]  𝐅𝐚𝐢𝐥 setting
+    → Error: Cannot find module '../../pdata/2.json'
+Require stack:
+- /root/filebot1/ok/modules/commands/setting.js
+- /root/filebot1/ok/main.js
+    at Function.Module._resolveFilename (node:internal/modules/cjs/loader:1212:15)
+    at Function.Module._load (node:internal/modules/cjs/loader:1043:27)
+    at Module.require (node:internal/modules/cjs/loader:1298:19)
+    at require (node:internal/modules/helpers:182:18)
+    at Object.<anonymous> (/root/filebot1/ok/modules/commands/setting.js:16:18)
+    at Module._compile (node:internal/modules/cjs/loader:1529:14)
+    at Object.Module._extensions..js (node:internal/modules/cjs/loader:1613:10)
+    at Module.load (node:internal/modules/cjs/loader:1275:32)
+    at Function.Module._load (node:internal/modules/cjs/loader:1096:12)
+    at Module.require (node:internal/modules/cjs/loader:1298:19)
+    at require (node:internal/modules/helpers:182:18)
+    at /root/filebot1/ok/main.js:369:22
+    at /root/filebot1/ok/f/Main.js:1245:17
+    at tryCatcher (/root/filebot1/ok/f/node_modules/bluebird/js/release/util.js:16:23)
+    at Promise._settlePromiseFromHandler (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:547:31)
+    at Promise._settlePromise (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:604:18)
+
+✖ [ PCODER ]  𝐅𝐚𝐢𝐥 tap
+    → Error: Tên module bị trùng với một module mang cùng tên khác!
+    at /root/filebot1/ok/main.js:371:73
+    at /root/filebot1/ok/f/Main.js:1245:17
+    at tryCatcher (/root/filebot1/ok/f/node_modules/bluebird/js/release/util.js:16:23)
+    at Promise._settlePromiseFromHandler (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:547:31)
+    at Promise._settlePromise (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:604:18)
+    at Promise._settlePromise0 (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:649:10)
+    at Promise._settlePromises (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:729:18)
+    at Promise._fulfill (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:673:18)
+    at Promise._resolveCallback (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:466:57)
+    at Promise._settlePromiseFromHandler (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:559:17)
+    at Promise._settlePromise (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:604:18)
+    at Promise._settlePromise0 (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:649:10)
+    at Promise._settlePromises (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:729:18)
+    at Promise._fulfill (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:673:18)
+    at Promise._resolveCallback (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:466:57)
+    at Promise._settlePromiseFromHandler (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:559:17)
+    at Promise._settlePromise (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:604:18)
+    at Promise._settlePromise0 (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:649:10)
+    at Promise._settlePromises (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:729:18)
+    at Promise._fulfill (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:673:18)
+    at Promise._resolveCallback (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:466:57)
+    at Promise._settlePromiseFromHandler (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:559:17)
+    at Promise._settlePromise (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:604:18)
+    at Promise._settlePromise0 (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:649:10)
+    at Promise._settlePromises (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:729:18)
+    at Promise._fulfill (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:673:18)
+    at Promise._resolveCallback (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:466:57)
+    at Promise._settlePromiseFromHandler (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:559:17)
+
+✖ [ PCODER ]  𝐅𝐚𝐢𝐥 thoitiet
+    → Error: Tên module bị trùng với một module mang cùng tên khác!
+    at /root/filebot1/ok/main.js:371:73
+    at /root/filebot1/ok/f/Main.js:1245:17
+    at tryCatcher (/root/filebot1/ok/f/node_modules/bluebird/js/release/util.js:16:23)
+    at Promise._settlePromiseFromHandler (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:547:31)
+    at Promise._settlePromise (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:604:18)
+    at Promise._settlePromise0 (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:649:10)
+    at Promise._settlePromises (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:729:18)
+    at Promise._fulfill (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:673:18)
+    at Promise._resolveCallback (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:466:57)
+    at Promise._settlePromiseFromHandler (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:559:17)
+    at Promise._settlePromise (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:604:18)
+    at Promise._settlePromise0 (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:649:10)
+    at Promise._settlePromises (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:729:18)
+    at Promise._fulfill (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:673:18)
+    at Promise._resolveCallback (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:466:57)
+    at Promise._settlePromiseFromHandler (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:559:17)
+    at Promise._settlePromise (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:604:18)
+    at Promise._settlePromise0 (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:649:10)
+    at Promise._settlePromises (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:729:18)
+    at Promise._fulfill (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:673:18)
+    at Promise._resolveCallback (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:466:57)
+    at Promise._settlePromiseFromHandler (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:559:17)
+    at Promise._settlePromise (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:604:18)
+    at Promise._settlePromise0 (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:649:10)
+    at Promise._settlePromises (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:729:18)
+    at Promise._fulfill (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:673:18)
+    at Promise._resolveCallback (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:466:57)
+    at Promise._settlePromiseFromHandler (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:559:17)
+
+✖ [ PCODER ]  𝐅𝐚𝐢𝐥 vdgai
+    → Error: Tên module bị trùng với một module mang cùng tên khác!
+    at /root/filebot1/ok/main.js:371:73
+    at /root/filebot1/ok/f/Main.js:1245:17
+    at tryCatcher (/root/filebot1/ok/f/node_modules/bluebird/js/release/util.js:16:23)
+    at Promise._settlePromiseFromHandler (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:547:31)
+    at Promise._settlePromise (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:604:18)
+    at Promise._settlePromise0 (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:649:10)
+    at Promise._settlePromises (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:729:18)
+    at Promise._fulfill (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:673:18)
+    at Promise._resolveCallback (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:466:57)
+    at Promise._settlePromiseFromHandler (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:559:17)
+    at Promise._settlePromise (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:604:18)
+    at Promise._settlePromise0 (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:649:10)
+    at Promise._settlePromises (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:729:18)
+    at Promise._fulfill (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:673:18)
+    at Promise._resolveCallback (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:466:57)
+    at Promise._settlePromiseFromHandler (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:559:17)
+    at Promise._settlePromise (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:604:18)
+    at Promise._settlePromise0 (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:649:10)
+    at Promise._settlePromises (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:729:18)
+    at Promise._fulfill (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:673:18)
+    at Promise._resolveCallback (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:466:57)
+    at Promise._settlePromiseFromHandler (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:559:17)
+    at Promise._settlePromise (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:604:18)
+    at Promise._settlePromise0 (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:649:10)
+    at Promise._settlePromises (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:729:18)
+    at Promise._fulfill (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:673:18)
+    at Promise._resolveCallback (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:466:57)
+    at Promise._settlePromiseFromHandler (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:559:17)
+
+✖ [ PCODER ]  𝐅𝐚𝐢𝐥 xsmb
+    → /root/filebot1/ok/modules/commands/xsmb.js:34
+}
+^
+
+SyntaxError: Missing catch or finally after try
+    at wrapSafe (node:internal/modules/cjs/loader:1472:18)
+    at Module._compile (node:internal/modules/cjs/loader:1501:20)
+    at Object.Module._extensions..js (node:internal/modules/cjs/loader:1613:10)
+    at Module.load (node:internal/modules/cjs/loader:1275:32)
+    at Function.Module._load (node:internal/modules/cjs/loader:1096:12)
+    at Module.require (node:internal/modules/cjs/loader:1298:19)
+    at require (node:internal/modules/helpers:182:18)
+    at /root/filebot1/ok/main.js:369:22
+    at /root/filebot1/ok/f/Main.js:1245:17
+    at tryCatcher (/root/filebot1/ok/f/node_modules/bluebird/js/release/util.js:16:23)
+    at Promise._settlePromiseFromHandler (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:547:31)
+    at Promise._settlePromise (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:604:18)
+    at Promise._settlePromise0 (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:649:10)
+    at Promise._settlePromises (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:729:18)
+    at Promise._fulfill (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:673:18)
+    at Promise._resolveCallback (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:466:57)
+    at Promise._settlePromiseFromHandler (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:559:17)
+    at Promise._settlePromise (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:604:18)
+    at Promise._settlePromise0 (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:649:10)
+    at Promise._settlePromises (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:729:18)
+    at Promise._fulfill (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:673:18)
+    at Promise._resolveCallback (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:466:57)
+    at Promise._settlePromiseFromHandler (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:559:17)
+    at Promise._settlePromise (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:604:18)
+    at Promise._settlePromise0 (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:649:10)
+    at Promise._settlePromises (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:729:18)
+    at Promise._fulfill (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:673:18)
+    at Promise._resolveCallback (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:466:57)
+
+✖ [ PCODER ]  𝐅𝐚𝐢𝐥 đổi
+    → Error: Tên module bị trùng với một module mang cùng tên khác!
+    at /root/filebot1/ok/main.js:371:73
+    at /root/filebot1/ok/f/Main.js:1245:17
+    at tryCatcher (/root/filebot1/ok/f/node_modules/bluebird/js/release/util.js:16:23)
+    at Promise._settlePromiseFromHandler (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:547:31)
+    at Promise._settlePromise (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:604:18)
+    at Promise._settlePromise0 (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:649:10)
+    at Promise._settlePromises (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:729:18)
+    at Promise._fulfill (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:673:18)
+    at Promise._resolveCallback (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:466:57)
+    at Promise._settlePromiseFromHandler (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:559:17)
+    at Promise._settlePromise (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:604:18)
+    at Promise._settlePromise0 (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:649:10)
+    at Promise._settlePromises (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:729:18)
+    at Promise._fulfill (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:673:18)
+    at Promise._resolveCallback (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:466:57)
+    at Promise._settlePromiseFromHandler (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:559:17)
+    at Promise._settlePromise (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:604:18)
+    at Promise._settlePromise0 (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:649:10)
+    at Promise._settlePromises (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:729:18)
+    at Promise._fulfill (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:673:18)
+    at Promise._resolveCallback (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:466:57)
+    at Promise._settlePromiseFromHandler (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:559:17)
+    at Promise._settlePromise (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:604:18)
+    at Promise._settlePromise0 (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:649:10)
+    at Promise._settlePromises (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:729:18)
+    at Promise._fulfill (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:673:18)
+    at Promise._resolveCallback (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:466:57)
+    at Promise._settlePromiseFromHandler (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:559:17)
+
+✖ [ PCODER ]  𝐅𝐚𝐢𝐥 leaveNoti
+    → /root/filebot1/ok/modules/events/leaveNoti.js:28
+    const { join } = require(["path");
+                                    ^
+
+SyntaxError: Unexpected token ')'
+    at wrapSafe (node:internal/modules/cjs/loader:1472:18)
+    at Module._compile (node:internal/modules/cjs/loader:1501:20)
+    at Object.Module._extensions..js (node:internal/modules/cjs/loader:1613:10)
+    at Module.load (node:internal/modules/cjs/loader:1275:32)
+    at Function.Module._load (node:internal/modules/cjs/loader:1096:12)
+    at Module.require (node:internal/modules/cjs/loader:1298:19)
+    at require (node:internal/modules/helpers:182:18)
+    at /root/filebot1/ok/main.js:421:21
+    at /root/filebot1/ok/f/Main.js:1245:17
+    at tryCatcher (/root/filebot1/ok/f/node_modules/bluebird/js/release/util.js:16:23)
+    at Promise._settlePromiseFromHandler (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:547:31)
+    at Promise._settlePromise (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:604:18)
+    at Promise._settlePromise0 (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:649:10)
+    at Promise._settlePromises (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:729:18)
+    at Promise._fulfill (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:673:18)
+    at Promise._resolveCallback (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:466:57)
+    at Promise._settlePromiseFromHandler (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:559:17)
+    at Promise._settlePromise (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:604:18)
+    at Promise._settlePromise0 (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:649:10)
+    at Promise._settlePromises (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:729:18)
+    at Promise._fulfill (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:673:18)
+    at Promise._resolveCallback (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:466:57)
+    at Promise._settlePromiseFromHandler (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:559:17)
+    at Promise._settlePromise (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:604:18)
+    at Promise._settlePromise0 (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:649:10)
+    at Promise._settlePromises (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:729:18)
+    at Promise._fulfill (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:673:18)
+    at Promise._resolveCallback (/root/filebot1/ok/f/node_modules/bluebird/js/release/promise.js:466:57)

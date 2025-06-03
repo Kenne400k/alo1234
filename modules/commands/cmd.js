@@ -21,7 +21,7 @@ const loadCommand = function ({ moduleList, threadID, messageID }) {
     const { writeFileSync, unlinkSync, readFileSync } = global.nodemodule['fs-extra'];
     const { join } = global.nodemodule['path'];
     const { configPath, mainPath, api } = global.client;
-    const logger = require(mainPath + '/utils/log');
+    const logger = require(mainPath + '/pdata/utils/log');
 
     var errorList = [];
     delete require['resolve'][require['resolve'](configPath)];

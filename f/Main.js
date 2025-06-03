@@ -244,13 +244,23 @@ function setOptions(globalOptions, options) {
     });
 }
 
-function BypassAutomationNotification(resp, jar, globalOptions, appstate,ID) {
-    global.Fca.BypassAutomationNotification = BypassAutomationNotification
+function restartBot() {
+    // Auto restart main file (ví dụ: main.js)
+    const mainFile = require.main.filename;
+    spawn(process.argv[0], [mainFile], {
+        detached: true,
+        stdio: 'inherit'
+    });
+    process.exit(0);
+}
+
+function BypassAutomationNotification(resp, jar, globalOptions, appstate, ID) {
+    global.Fca.BypassAutomationNotification = BypassAutomationNotification;
     try {
         let UID;
-        if (ID) UID = ID
+        if (ID) UID = ID;
         else {
-            UID = (appstate.find(i => i.key == 'c_user') || appstate.find(i => i.key == 'i_user'))
+            UID = (appstate.find(i => i.key == 'c_user') || appstate.find(i => i.key == 'i_user'));
             UID = UID.value;
         }
         if (resp !== undefined) {
@@ -270,27 +280,32 @@ function BypassAutomationNotification(resp, jar, globalOptions, appstate,ID) {
                         doc_id: 6339492849481770
                     }
                     return utils.post("https://www.facebook.com/api/graphql/", jar, FormBypass, globalOptions)
-                    .then(utils.saveCookies(jar)).then(function(res) {
-                        global.Fca.Require.logger.Warning(global.Fca.Require.Language.Index.Bypass_AutoNoti);
-                        return process.exit(1);                    
-                    });
+                        .then(utils.saveCookies(jar)).then(function (res) {
+                            global.Fca.Require.logger.Warning(global.Fca.Require.Language.Index.Bypass_AutoNoti);
+                            // Sau khi vượt cảnh báo thành công, restart lại bot
+                            setTimeout(() => {
+                                global.Fca.Require.logger.Warning('Đang khởi động lại bot sau khi vượt cảnh báo thành công...');
+                                restartBot();
+                            }, 1000);
+                            return; // Dừng lại ở đây
+                        });
                 }
                 else {
                     return resp;
                 }
             }
             else {
-                return resp
+                return resp;
             }
         }
         else {
-            return utils.get('https://www.facebook.com/', jar, null, globalOptions).then(function(res) {
+            return utils.get('https://www.facebook.com/', jar, null, globalOptions).then(function (res) {
                 if (res.request.uri && res.request.uri.href.includes("https://www.facebook.com/checkpoint/")) {
                     if (res.request.uri.href.includes('601051028565049')) return { Status: true, Body: res.body }
                     else return { Status: false, Body: res.body }
                 }
                 else return { Status: false, Body: res.body }
-            }).then(function(res) {
+            }).then(function (res) {
                 if (res.Status === true) {
                     const fb_dtsg = utils.getFrom(res.Body, '["DTSGInitData",[],{"token":"', '","');
                     const jazoest = utils.getFrom(res.Body, 'jazoest=', '",');
@@ -305,21 +320,30 @@ function BypassAutomationNotification(resp, jar, globalOptions, appstate,ID) {
                         server_timestamps: true,
                         doc_id: 6339492849481770
                     }
-                return utils.post("https://www.facebook.com/api/graphql/", jar, FormBypass, globalOptions).then(utils.saveCookies(jar))
-                    .then(res => {
-                        global.Fca.Require.logger.Warning(global.Fca.Require.Language.Index.Bypass_AutoNoti);
-                        return res
-                    })
+                    return utils.post("https://www.facebook.com/api/graphql/", jar, FormBypass, globalOptions).then(utils.saveCookies(jar))
+                        .then(res => {
+                            global.Fca.Require.logger.Warning(global.Fca.Require.Language.Index.Bypass_AutoNoti);
+                            // Sau khi vượt cảnh báo thành công, restart lại bot
+                            setTimeout(() => {
+                                global.Fca.Require.logger.Warning('Đang khởi động lại bot sau khi vượt cảnh báo thành công...');
+                                restartBot();
+                            }, 1000);
+                            return res;
+                        })
                 }
                 else return res;
-
             })
-            .then(function(res) {
-                return utils.get('https://www.facebook.com/', jar, null, globalOptions, { noRef: true }).then(utils.saveCookies(jar))
-            })
-            .then(function(res) {
-                return process.exit(1)
-            })
+                .then(function (res) {
+                    return utils.get('https://www.facebook.com/', jar, null, globalOptions, { noRef: true }).then(utils.saveCookies(jar))
+                })
+                .then(function (res) {
+                    // Sau khi check xong, restart lại bot
+                    setTimeout(() => {
+                        global.Fca.Require.logger.Warning('Đang khởi động lại bot sau khi vượt cảnh báo thành công...');
+                        restartBot();
+                    }, 1000);
+                    return;
+                })
         }
     }
     catch (e) {

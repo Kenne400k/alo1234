@@ -75,10 +75,16 @@ async function streamURL(url, ext = 'mp4') {
   } catch (e) { return null; }
 }
 
+// BẮT BUỘC: exports.run để không lỗi định dạng (dù không cần thiết, vẫn phải có!)
+exports.run = async function({ api, event, args }) {
+  api.sendMessage("atdfb là module tự động tải video Facebook khi phát hiện liên kết, không cần gọi lệnh!", event.threadID, event.messageID);
+};
+
 exports.handleEvent = async function({ api, event }) {
   if (event.senderID == api.getCurrentUserID()) return;
   const send = (msg, callback) => api.sendMessage(msg, event.threadID, callback, event.messageID);
   const head = app => `[ 𝐀𝐔𝐓𝐎𝐃𝐎𝐖𝐍 ${app} ]\n────────────────`;
+  if (!event.body) return;
   const urls = urlify(event.body);
 
   for (const str of urls) {

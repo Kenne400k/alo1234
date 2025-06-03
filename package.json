@@ -13,8 +13,8 @@
     "url": "git+https://github.com/dongdev06/miraiv2.git"
   },
   "engines": {
-  "node": ">=20.0.0"
-},
+    "node": ">=20.0.0"
+  },
   "author": "Pcoder",
   "license": "GPL-3.0",
   "dependencies": {
@@ -47,6 +47,7 @@
     "extract-zip": "^2.0.1",
     "fast-speedtest-api": "^0.3.2",
     "fb-downloader-new": "^0.0.2",
+    "fca-horizon-remake": "github:JustGonDev/Fca-Horizon-Remake",
     "fca-project-orion": "github:ivancotacte/fca-project-orion",
     "ffmpeg-static": "^5.2.0",
     "figlet": "^1.7.0",
@@ -92,6 +93,7 @@
     "sequelize": "^6.33.0",
     "sharp": "^0.30.7",
     "simple-youtube-api": "^5.2.1",
+    "socks-proxy-agent": "^8.0.5",
     "soundcloud-downloader": "^1.0.0",
     "sqlite3": "^5.1.6",
     "stackblur-canvas": "^2.6.0",
@@ -106,6 +108,7 @@
     "weather-js": "^2.0.0",
     "wikijs": "^6.4.1",
     "youtube-search-api": "^1.2.2",
-    "ytdl-core": "^4.11.5"
+    "ytdl-core": "^4.11.5",
+    "zingmp3-api": "^1.0.10"
   }
 }

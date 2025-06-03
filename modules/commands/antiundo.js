@@ -20,14 +20,14 @@ module.exports.run = async ({ api, event, args }) => {
   if (on) {
     // Bật anti thu hồi tin nhắn
     api.sendMessage("Anti thu hồi tin nhắn đã được bật!", threadID, messageID);
-    fs.writeFileSync(path.join(__dirname, './data_dongdev/antiundo.json'), JSON.stringify({ enabled: true }));
+    fs.writeFileSync(path.join(__dirname, './pdata/data_dongdev/antiundo.json'), JSON.stringify({ enabled: true }));
   } else if (off) {
     // Tắt anti thu hồi tin nhắn
     api.sendMessage("Anti thu hồi tin nhắn đã được tắt!", threadID, messageID);
-    fs.writeFileSync(path.join(__dirname, './data_dongdev/antiundo.json'), JSON.stringify({ enabled: false }));
+    fs.writeFileSync(path.join(__dirname, './pdata/data_dongdev/antiundo.json'), JSON.stringify({ enabled: false }));
   } else {
     // Kiểm tra trạng thái anti thu hồi tin nhắn
-    const antirecallStatus = fs.readFileSync(path.join(__dirname, './data_dongdev/antiundo.json'), 'utf8');
+    const antirecallStatus = fs.readFileSync(path.join(__dirname, './pdata/data_dongdev/antiundo.json'), 'utf8');
     const enabled = JSON.parse(antirecallStatus).enabled;
     if (enabled) {
       api.sendMessage("Anti thu hồi tin nhắn đang được bật!", threadID, messageID);
@@ -43,11 +43,11 @@ module.exports.run = async ({ api, event, args }) => {
     const thread = event.threadID;
 
     // Kiểm tra trạng thái anti thu hồi tin nhắn
-    const antirecallStatus = fs.readFileSync(path.join(__dirname, './data_dongdev/antiundo.json'), 'utf8');
+    const antirecallStatus = fs.readFileSync(path.join(__dirname, './pdata/data_dongdev/antiundo.json'), 'utf8');
     const enabled = JSON.parse(antirecallStatus).enabled;
     if (enabled) {
       // Ghi tên người gửi và nội dung đã thu hồi
-      const logFilePath = path.join(__dirname, './data_dongdev/undo.log');
+      const logFilePath = path.join(__dirname, './pdata/data_dongdev/undo.log');
       fs.appendFileSync(logFilePath, `Người gửi: ${sender}\nNội dung: ${message.body}\nThread: ${thread}\n\n`);
 
       // Ghi video, ảnh đã thu hồi

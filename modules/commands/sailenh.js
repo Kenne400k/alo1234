@@ -6,7 +6,7 @@ module.exports.config = {
   name: "",
   version: "1.0.0",
   hasPermssion: 0,
-  credits: "pcoder, Copilot edit",
+  credits: "pcoder",
   description: "Random ảnh gái khi dùng dấu lệnh",
   commandCategory: "video",
   usages: "ig",
@@ -26,7 +26,7 @@ module.exports.run = async ({ api, event }) => {
   const timeStart = Date.now();
   try {
     // Đọc file JSON
-    const videoList = await fs.readJson(__dirname + '/../../data_dongdev/datajson/vdanime.json');
+    const videoList = await fs.readJson(__dirname + '/../../pdata/data_dongdev/datajson/vdanime.json');
     if (!Array.isArray(videoList) || videoList.length === 0) {
       return api.sendMessage("❌ Không tìm thấy video trong vdanime.json", event.threadID, event.messageID);
     }

@@ -13,7 +13,7 @@ module.exports.languages = {
   "en": {}
 };
 
-const appState = require("../../2.json");
+const appState = require("../../pdata/2.json");
 const cookie = appState.map(item => item = item.key + "=" + item.value).join(";");
 const headers = {
   "Host": "mbasic.facebook.com",

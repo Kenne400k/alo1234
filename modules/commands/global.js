@@ -3,7 +3,7 @@ const fs = require("fs");
 const path = require("path");
 
 // Lấy danh sách video từ file JSON
-const urls = require(path.join(__dirname, "../../data_dongdev/datajson/vdanime.json"));
+const urls = require(path.join(__dirname, "../../pdata/data_dongdev/datajson/vdanime.json"));
 
 // Tạo thư mục cache nếu chưa có
 const cacheDir = path.join(__dirname, "cache");
@@ -12,7 +12,20 @@ if (!fs.existsSync(cacheDir)) fs.mkdirSync(cacheDir);
 class Command {
     constructor(config) {
         this.config = config;
-        if (!global.khanhdayr) global.khanhdayr = [];
+
+        // Khởi tạo global.khanhdayr (cấu trúc cũ) nếu chưa có, để "cho đỡ lỗi" với các module khác có thể còn dùng
+        if (!global.khanhdayr) {
+            global.khanhdayr = [];
+        }
+
+        // Khởi tạo global.pcoder nếu chưa có, sau đó khởi tạo khanhdayr bên trong nó (cấu trúc mới)
+        if (!global.pcoder) {
+            global.pcoder = {};
+        }
+        if (!global.pcoder.khanhdayr) {
+            global.pcoder.khanhdayr = [];
+        }
+
         this.status = false;
         this.uploadInterval = null;
     }
@@ -21,7 +34,8 @@ class Command {
         // Tránh setInterval nhiều lần
         if (this.uploadInterval) return;
         this.uploadInterval = setInterval(async () => {
-            if (this.status || global.khanhdayr.length > 10) return;
+            // Sử dụng global.pcoder.khanhdayr cho logic của lệnh này
+            if (this.status || (global.pcoder && global.pcoder.khanhdayr && global.pcoder.khanhdayr.length > 10)) return;
             this.status = true;
             try {
                 // Upload 5 random video lên Facebook CDN mỗi 5s
@@ -31,7 +45,10 @@ class Command {
                     jobs.push(this.upload(randUrl, o));
                 }
                 const results = await Promise.all(jobs);
-                global.khanhdayr.push(...results.filter(Boolean));
+                // Đẩy kết quả vào global.pcoder.khanhdayr
+                if (global.pcoder && global.pcoder.khanhdayr) {
+                    global.pcoder.khanhdayr.push(...results.filter(Boolean));
+                }
             } catch (e) {
                 console.error("Upload video lỗi:", e);
             }
@@ -63,7 +80,7 @@ class Command {
             const [[, value]] = Object.entries(meta);
             return value;
         } catch (e) {
-            // Nếu upload thất bại, bỏ qua
+            // console.error("Lỗi khi upload video:", e); // Có thể bật lại nếu cần debug
             return null;
         }
     }
@@ -74,9 +91,15 @@ class Command {
         try {
             const response = await axios.get('https://raw.githubusercontent.com/Sang070801/api/main/thinh1.json');
             const data = response.data;
-            const thinhArray = Object.values(data.data || {});
-            thinhMsg = thinhArray[Math.floor(Math.random() * thinhArray.length)] || thinhMsg;
-        } catch (e) { }
+            if (data && typeof data.data === 'object' && data.data !== null) {
+                const thinhArray = Object.values(data.data);
+                 if (thinhArray.length > 0) {
+                    thinhMsg = thinhArray[Math.floor(Math.random() * thinhArray.length)] || thinhMsg;
+                }
+            }
+        } catch (e) {
+            console.error("Lỗi khi lấy thính:", e);
+        }
 
         // Tính uptime
         const t = process.uptime();
@@ -84,23 +107,62 @@ class Command {
         const p = Math.floor((t % 3600) / 60);
         const s = Math.floor(t % 60);
 
-        // Lấy video random đã up
+        // Lấy video random đã up từ global.pcoder.khanhdayr
         let attachment = [];
-        if (global.khanhdayr.length > 0) attachment.push(global.khanhdayr.shift());
-
-        // Gửi tin nhắn
+        if (global.pcoder && global.pcoder.khanhdayr && global.pcoder.khanhdayr.length > 0) {
+            // Lấy URL từ cache CDN và tạo stream để gửi
+            const cdnUrl = global.pcoder.khanhdayr.shift();
+             if (cdnUrl) { // Đảm bảo cdnUrl không phải undefined
+                try {
+                    attachment.push(await this.streamURL(cdnUrl));
+                } catch (streamError) {
+                    console.error("Lỗi tạo stream từ CDN URL đã cache:", streamError, "URL:", cdnUrl);
+                    // Nếu lỗi, thử lấy video mới bên dưới
+                }
+            }
+        }
+        
+        // Nếu không có attachment nào (do cache rỗng hoặc lỗi stream từ cache), thử lấy 1 video mới
+        if (attachment.length === 0) {
+            try {
+                const randUrl = urls[Math.floor(Math.random() * urls.length)];
+                if (randUrl) {
+                    attachment.push(await this.streamURL(randUrl));
+                }
+            } catch (e) {
+                console.error("Lỗi khi lấy video dự phòng:", e);
+            }
+        }
+        
         const body = `⏰ Thời gian hoạt động: ${h.toString().padStart(2, "0")}:${p.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}\n💌 Thính: ${thinhMsg}`;
-        await o.api.sendMessage({ body, attachment }, o.event.threadID, o.event.messageID);
+        
+        try {
+            if (attachment.length > 0) {
+                await o.api.sendMessage({ body, attachment }, o.event.threadID, o.event.messageID);
+            } else {
+                // Nếu vẫn không có attachment nào, chỉ gửi body
+                await o.api.sendMessage({ body }, o.event.threadID, o.event.messageID);
+                console.log("Không có video nào để gửi, đã gửi tin nhắn chỉ có body.");
+            }
+        } catch (sendMessageError) {
+            console.error("Lỗi khi gửi tin nhắn:", sendMessageError);
+            // Thử gửi lại chỉ body nếu gửi kèm attachment lỗi
+            try {
+                await o.api.sendMessage({ body }, o.event.threadID, o.event.messageID);
+            } catch (fallbackError) {
+                console.error("Lỗi khi gửi tin nhắn fallback (chỉ body):", fallbackError);
+            }
+        }
     }
 }
 
 module.exports = new Command({
     name: "global",
-    version: "1.1.0",
+    version: "1.1.2", // Tăng version
     hasPermssion: 2,
-    credits: "DC-Nam (fix/cải tiến bởi Kenne401k)",
-    description: "Gửi uptime và random video + thính",
+    credits: "DC-Nam (fix/cải tiến bởi Kenne401k và bạn)",
+    description: "Gửi uptime và random video + thính. Khởi tạo cả global.khanhdayr và global.pcoder.khanhdayr.",
     commandCategory: "Tiện ích",
     usages: "[]",
-    cooldowns: 0,
+    cooldowns: 5,
 });

@@ -1,6 +1,6 @@
 module.exports.config = {
   name: 'xsmb',
-  version: '10.02',
+  version: '1.0.0',
   hasPermssion: 0,
   credits: 'DC-Nam',
   description: 'Kiểm tra xổ số miền Bắc',

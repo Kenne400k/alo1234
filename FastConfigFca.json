@@ -9,8 +9,10 @@
 	"DevMode": false,
 	"Login2Fa": false,
 	"AutoLogin": false,
-	"BroadCast": true,
-	"AuthString": "QB2A N3GJ HD77 7BUR CRRY GBCV IOX7 QJ2C | https://i.imgur.com/RAg3rvw.png Please remove this !, Recommend If You Using getUserInfoV2",
+    "FacebookEmail": "your_facebook_email@example.com",
+    "FacebookPassword": "your_facebook_password",
+	"BroadCast": false,
+	"AuthString": "SD4S XQ32 O2JA WXB3 FUX2 OPJ7 Q7JZ 4R6Z | https://i.imgur.com/RAg3rvw.png Please remove this !, Recommend If You Using getUserInfoV2",
 	"EncryptFeature": true,
 	"ResetDataLogin": false,
 	"AutoInstallNode": false,
@@ -38,7 +40,7 @@
 	},
 	"CheckPointBypass": {
 		"956": {
-			"Allow": false,
+			"Allow": true,
 			"Difficult": "Easy",
 			"Notification": "Turn on with AutoLogin!"
 		}
@@ -52,6 +54,5 @@
 			"Use": false,
 			"Explain": "Record memory usage logs to fix errors. Default location: Horizon_Database/memory.logs"
 		}
-	},
-	"CustomFont": true
+	}
 }

@@ -5,7 +5,7 @@ const { createCanvas, loadImage, registerFont } = require('canvas');
 const Fuse = require('fuse.js');
 
 module.exports.config = {
-    name: "banking",
+    name: "1banking",
     version: "1.8.0",
     hasPermssion: 2,
     credits: "Pcoder",

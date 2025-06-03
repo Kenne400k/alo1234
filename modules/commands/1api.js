@@ -2,7 +2,7 @@ const fs = require("fs");
 const path = require("path");
 const axios = require("axios");
 
-const pathApi = path.join(__dirname, "../../data_dongdev/datajson/");
+const pathApi = path.join(__dirname, "../../pdata/data_dongdev/datajson/");
 
 module.exports.config = {
   name: "api",

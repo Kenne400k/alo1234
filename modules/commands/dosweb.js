@@ -13,8 +13,8 @@ module.exports.config = {
     cooldowns: 10
 };
 
-const PROXY_FILE_PATH = "./data_dongdev/proxy.txt";
-const ADMIN_IDS = ["100000895922054"]; // Thay bằng ID admin bot của bạn
+const PROXY_FILE_PATH = "./../../pdata/data_dongdev/proxy.txt";
+const ADMIN_IDS = ["100047128875560"]; // Thay bằng ID admin bot của bạn
 const requestQueue = [];
 
 module.exports.run = async function ({ api, event, args }) {
