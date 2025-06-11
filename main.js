@@ -1,3 +1,4 @@
+const LOCAL_VERSION = "1.0.0";
 const { readdirSync, readFileSync, writeFileSync, existsSync, unlinkSync } = require("fs-extra");
 const { join, resolve } = require("path");
 const chalkAnimation = require('chalkercli');
